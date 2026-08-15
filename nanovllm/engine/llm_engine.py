@@ -74,26 +74,35 @@ class LLMEngine:
         for prompt, sp in zip(prompts, sampling_params):
             self.add_request(prompt, sp)
         outputs = {}
+        scheduler_before = dict(self.scheduler.metrics)
         prefill_seconds = decode_seconds = 0.0
+        mixed_seconds = 0.0
         prefill_tokens = decode_tokens = 0
-        prefill_iterations = decode_iterations = 0
+        prefill_iterations = decode_iterations = mixed_iterations = 0
         started = perf_counter()
         prefill_throughput = decode_throughput = 0.
         while not self.is_finished():
             t = perf_counter()
             output, num_tokens = self.step()
-            if num_tokens > 0:
-                elapsed = perf_counter() - t
+            elapsed = perf_counter() - t
+            batch_stats = self.scheduler.last_batch_stats
+            batch_prefill = batch_stats["prefill_tokens"]
+            batch_decode = batch_stats["decode_tokens"]
+            if batch_prefill:
                 prefill_seconds += elapsed
-                prefill_tokens += num_tokens
+                prefill_tokens += batch_prefill
                 prefill_iterations += 1
-                prefill_throughput = num_tokens / elapsed
-            else:
-                elapsed = perf_counter() - t
+                prefill_throughput = batch_prefill / elapsed
+                if batch_decode:
+                    mixed_seconds += elapsed
+                    mixed_iterations += 1
+                    decode_tokens += batch_decode
+                    decode_throughput = batch_decode / elapsed
+            elif batch_decode:
                 decode_seconds += elapsed
-                decode_tokens -= num_tokens
+                decode_tokens += batch_decode
                 decode_iterations += 1
-                decode_throughput = -num_tokens / elapsed
+                decode_throughput = batch_decode / elapsed
             pbar.set_postfix({
                 "Prefill": f"{int(prefill_throughput)}tok/s",
                 "Decode": f"{int(decode_throughput)}tok/s",
@@ -117,9 +126,22 @@ class LLMEngine:
             "decode_seconds": decode_seconds,
             "total_seconds": total_seconds,
             "prefill_tokens_per_second": prefill_tokens / prefill_seconds if prefill_seconds else 0.0,
-            "decode_tokens_per_second": decode_tokens / decode_seconds if decode_seconds else 0.0,
+            "decode_tokens_per_second": (
+                decode_tokens / (decode_seconds + mixed_seconds)
+                if decode_seconds + mixed_seconds else 0.0
+            ),
             "output_tokens_per_second": output_tokens / total_seconds if total_seconds else 0.0,
             "batch_ttft_seconds": prefill_seconds,
-            "mean_tpot_seconds": decode_seconds / decode_iterations if decode_iterations else 0.0,
+            "mean_tpot_seconds": (
+                (decode_seconds + mixed_seconds)
+                / (decode_iterations + mixed_iterations)
+                if decode_iterations + mixed_iterations else 0.0
+            ),
+            "mixed_seconds": mixed_seconds,
+            "mixed_iterations": mixed_iterations,
+            "scheduler": {
+                key: value - scheduler_before[key]
+                for key, value in self.scheduler.metrics.items()
+            },
         }
         return outputs

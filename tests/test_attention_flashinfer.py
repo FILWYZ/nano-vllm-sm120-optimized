@@ -143,3 +143,57 @@ class TestFlashInferAttention(unittest.TestCase):
                                    torch.cat((old_v2, v[1:])), False)
         expected = torch.cat((expected1, expected2))
         torch.testing.assert_close(actual, expected, rtol=2e-3, atol=2e-3)
+
+    def test_mixed_decode_and_chunked_prefill(self):
+        page_size = 16
+        self.attn.k_cache = torch.zeros(
+            3, page_size, self.num_kv_heads, self.head_dim,
+            device=self.device, dtype=self.dtype,
+        )
+        self.attn.v_cache = torch.zeros_like(self.attn.k_cache)
+        old_decode_k = torch.randn(
+            5, self.num_kv_heads, self.head_dim,
+            device=self.device, dtype=self.dtype,
+        )
+        old_decode_v = torch.randn_like(old_decode_k)
+        prefix_k = torch.randn(
+            14, self.num_kv_heads, self.head_dim,
+            device=self.device, dtype=self.dtype,
+        )
+        prefix_v = torch.randn_like(prefix_k)
+        self.attn.k_cache[0, :5] = old_decode_k
+        self.attn.v_cache[0, :5] = old_decode_v
+        self.attn.k_cache[1, :14] = prefix_k
+        self.attn.v_cache[1, :14] = prefix_v
+        decode_q, decode_k, decode_v = self.random_qkv(1)
+        prefill_q, prefill_k, prefill_v = self.random_qkv(4)
+        q = torch.cat((decode_q, prefill_q))
+        k = torch.cat((decode_k, prefill_k))
+        v = torch.cat((decode_v, prefill_v))
+        cu_q = torch.tensor([0, 1, 5], device=self.device, dtype=torch.int32)
+        cu_k = torch.tensor([0, 6, 24], device=self.device, dtype=torch.int32)
+        slots = torch.tensor(
+            [5, 30, 31, 32, 33], device=self.device, dtype=torch.int32
+        )
+        blocks = torch.tensor(
+            [[0, -1], [1, 2]], device=self.device, dtype=torch.int32
+        )
+        set_context(True, cu_q, cu_k, 4, 18, slots, None, blocks)
+
+        actual = self.attn(q, k, v)
+        expected_decode = self.reference(
+            decode_q, torch.cat((old_decode_k, decode_k)),
+            torch.cat((old_decode_v, decode_v)), False,
+        )
+        full_k = torch.cat((prefix_k, prefill_k))
+        full_v = torch.cat((prefix_v, prefill_v))
+        q_positions = torch.arange(4, device=self.device) + 14
+        k_positions = torch.arange(18, device=self.device)
+        mask = k_positions.unsqueeze(0) <= q_positions.unsqueeze(1)
+        expected_prefill = self.reference(
+            prefill_q, full_k, full_v, False, mask
+        )
+        torch.testing.assert_close(
+            actual, torch.cat((expected_decode, expected_prefill)),
+            rtol=2e-3, atol=2e-3,
+        )
