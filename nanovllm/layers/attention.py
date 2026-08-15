@@ -9,13 +9,17 @@ try:
 except ImportError:
     flash_attn_varlen_func = flash_attn_with_kvcache = None
 
+from nanovllm.layers.flashinfer_backend import (
+    flashinfer_available,
+    flashinfer_forward,
+)
 from nanovllm.utils.context import get_context
 
 _ATTENTION_BACKEND = "auto"
 
 
 def resolve_attention_backend(backend: str) -> str:
-    if backend not in {"auto", "flash", "sdpa"}:
+    if backend not in {"auto", "flash", "flashinfer", "sdpa"}:
         raise ValueError(f"Unsupported attention backend: {backend}")
     if backend == "flash":
         if flash_attn_varlen_func is None:
@@ -23,6 +27,12 @@ def resolve_attention_backend(backend: str) -> str:
                 "attention_backend='flash' requires the optional flash-attn package"
             )
         return "flash"
+    if backend == "flashinfer":
+        if not flashinfer_available():
+            raise RuntimeError(
+                "attention_backend='flashinfer' requires the flashinfer optional dependency"
+            )
+        return "flashinfer"
     if backend == "sdpa":
         return "sdpa"
 
@@ -30,7 +40,7 @@ def resolve_attention_backend(backend: str) -> str:
     # PyTorch backend on Blackwell until a wheel explicitly validated for the
     # installed PyTorch/CUDA combination is available.
     if torch.cuda.is_available() and torch.cuda.get_device_capability()[0] >= 12:
-        return "sdpa"
+        return "flashinfer" if flashinfer_available() else "sdpa"
     return "flash" if flash_attn_varlen_func is not None else "sdpa"
 
 
@@ -160,6 +170,11 @@ class Attention(nn.Module):
                 store_kvcache(k, v, k_cache, v_cache, context.slot_mapping)
             else:
                 store_kvcache_torch(k, v, k_cache, v_cache, context.slot_mapping)
+        if self.backend == "flashinfer":
+            return flashinfer_forward(
+                q, k, v, k_cache, v_cache, context,
+                self.num_heads, self.num_kv_heads, self.head_dim, self.scale,
+            )
         if self.backend == "sdpa":
             return self._forward_sdpa(q, k, v, context)
         if context.is_prefill:

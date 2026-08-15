@@ -11,6 +11,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Attention-only CUDA microbenchmark")
     parser.add_argument("--output", default="benchmarks/results/attention_latest.json")
     parser.add_argument("--warmup", type=int, default=10)
+    parser.add_argument("--backend", default="sdpa",
+                        choices=["sdpa", "flashinfer"])
     parser.add_argument("--iterations", type=int, default=50)
     return parser.parse_args()
 
@@ -75,7 +77,7 @@ def decode_case(batch_size: int, seq_len: int, warmup: int, iterations: int):
 
 def main():
     args = parse_args()
-    set_attention_backend("sdpa")
+    set_attention_backend(args.backend)
     cases = []
     for phase in ("prefill", "decode"):
         for batch_size in (1, 4, 8):
@@ -96,7 +98,7 @@ def main():
     write_json(args.output, {
         "schema_version": 1,
         "environment": environment(),
-        "backend": "sdpa",
+        "backend": args.backend,
         "cases": cases,
     })
     print(f"wrote={args.output}")

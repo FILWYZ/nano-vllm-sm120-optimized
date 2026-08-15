@@ -24,15 +24,21 @@ pip install git+https://github.com/GeeeekExplorer/nano-vllm.git
 
 ### RTX 50 series / Blackwell
 
-FlashAttention wheels may not yet match every PyTorch, CUDA, and Blackwell GPU
-combination. This fork therefore supports PyTorch SDPA as a safe fallback:
+Install the validated SM120 FlashInfer backend without replacing the project's
+PyTorch build:
+
+```bash
+uv pip install --python .venv/bin/python '.[flashinfer]'
+```
+
+PyTorch SDPA remains the readable correctness fallback:
 
 ```python
 from nanovllm import LLM
 
 llm = LLM(
     "/YOUR/MODEL/PATH",
-    attention_backend="auto",  # selects SDPA on compute capability 12.x
+    attention_backend="auto",  # selects FlashInfer on SM120 when installed
     tensor_parallel_size=1,
     max_model_len=512,
     max_num_batched_tokens=512,
@@ -41,10 +47,10 @@ llm = LLM(
 )
 ```
 
-Use `attention_backend="sdpa"` to force the compatibility backend, or install
-the optional `flash-attn` dependency and use `attention_backend="flash"` on a
-validated GPU/software combination. SDPA currently runs in eager mode because
-its paged-KV fallback contains dynamic sequence-length handling.
+Use `attention_backend="sdpa"` for the readable compatibility path or
+`attention_backend="flashinfer"` for the optimized paged-attention path.
+FlashAttention remains optional for validated GPU/software combinations.
+FlashInfer and SDPA remain eager until M3 adds decode graph capture.
 
 See [LOCAL_BASELINE.md](LOCAL_BASELINE.md) and run `bench_local.py` to reproduce
 the RTX 5060 Laptop baseline before making further optimizations.

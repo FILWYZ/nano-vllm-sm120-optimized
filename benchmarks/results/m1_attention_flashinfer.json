@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "timestamp_utc": "2026-08-15T05:45:57.207570+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "acafa117a088db0df70aa9ec7347697605c21e32"
+  },
+  "backend": "flashinfer",
+  "cases": [
+    {
+      "phase": "prefill",
+      "batch_size": 1,
+      "seq_len": 128,
+      "mean_ms": 0.036227839924395086,
+      "p50_ms": 0.031647998839616776,
+      "p95_ms": 0.0469760000705719
+    },
+    {
+      "phase": "prefill",
+      "batch_size": 1,
+      "seq_len": 512,
+      "mean_ms": 0.062184319868683814,
+      "p50_ms": 0.06188800185918808,
+      "p95_ms": 0.06761600077152252
+    },
+    {
+      "phase": "prefill",
+      "batch_size": 4,
+      "seq_len": 128,
+      "mean_ms": 0.0304160001501441,
+      "p50_ms": 0.029823999851942062,
+      "p95_ms": 0.033984001725912094
+    },
+    {
+      "phase": "prefill",
+      "batch_size": 4,
+      "seq_len": 512,
+      "mean_ms": 0.07957311943173409,
+      "p50_ms": 0.07718399912118912,
+      "p95_ms": 0.08799999952316284
+    },
+    {
+      "phase": "prefill",
+      "batch_size": 8,
+      "seq_len": 128,
+      "mean_ms": 0.03682559989392757,
+      "p50_ms": 0.036159999668598175,
+      "p95_ms": 0.04163200035691261
+    },
+    {
+      "phase": "prefill",
+      "batch_size": 8,
+      "seq_len": 512,
+      "mean_ms": 0.11775487944483758,
+      "p50_ms": 0.11139199882745743,
+      "p95_ms": 0.157151997089386
+    },
+    {
+      "phase": "decode",
+      "batch_size": 1,
+      "seq_len": 128,
+      "mean_ms": 0.5485081619024277,
+      "p50_ms": 0.5326079726219177,
+      "p95_ms": 0.6290879845619202
+    },
+    {
+      "phase": "decode",
+      "batch_size": 1,
+      "seq_len": 512,
+      "mean_ms": 0.5496575963497162,
+      "p50_ms": 0.5377600193023682,
+      "p95_ms": 0.6435199975967407
+    },
+    {
+      "phase": "decode",
+      "batch_size": 4,
+      "seq_len": 128,
+      "mean_ms": 0.5175936043262481,
+      "p50_ms": 0.5090240240097046,
+      "p95_ms": 0.5525760054588318
+    },
+    {
+      "phase": "decode",
+      "batch_size": 4,
+      "seq_len": 512,
+      "mean_ms": 0.5236390399932861,
+      "p50_ms": 0.5193920135498047,
+      "p95_ms": 0.5673919916152954
+    },
+    {
+      "phase": "decode",
+      "batch_size": 8,
+      "seq_len": 128,
+      "mean_ms": 0.5293683189153672,
+      "p50_ms": 0.520799994468689,
+      "p95_ms": 0.6113600134849548
+    },
+    {
+      "phase": "decode",
+      "batch_size": 8,
+      "seq_len": 512,
+      "mean_ms": 0.5534380811452866,
+      "p50_ms": 0.5257279872894287,
+      "p95_ms": 0.6937599778175354
+    }
+  ]
+}

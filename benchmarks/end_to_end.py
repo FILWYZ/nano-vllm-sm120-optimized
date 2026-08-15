@@ -21,7 +21,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="nano-vLLM end-to-end benchmark matrix")
     parser.add_argument("--model", required=True)
     parser.add_argument("--output", default="benchmarks/results/latest.json")
-    parser.add_argument("--backend", default="auto", choices=["auto", "sdpa", "flash"])
+    parser.add_argument("--backend", default="auto",
+                        choices=["auto", "sdpa", "flashinfer", "flash"])
     parser.add_argument("--max-model-len", type=int, default=512)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
     parser.add_argument("--warmup-repeats", type=int, default=1)

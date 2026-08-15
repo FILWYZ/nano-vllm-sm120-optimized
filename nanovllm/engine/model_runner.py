@@ -26,9 +26,10 @@ class ModelRunner:
         dist.init_process_group("nccl", "tcp://localhost:2333", world_size=self.world_size, rank=rank)
         torch.cuda.set_device(rank)
         config.attention_backend = set_attention_backend(config.attention_backend)
-        self.enforce_eager = config.enforce_eager or config.attention_backend == "sdpa"
-        if config.attention_backend == "sdpa" and not config.enforce_eager and rank == 0:
-            print("Using PyTorch SDPA attention; CUDA graph capture is disabled.")
+        compatibility_backend = config.attention_backend in {"sdpa", "flashinfer"}
+        self.enforce_eager = config.enforce_eager or compatibility_backend
+        if compatibility_backend and not config.enforce_eager and rank == 0:
+            print(f"Using {config.attention_backend} attention; CUDA graph capture is disabled until M3.")
         default_dtype = torch.get_default_dtype()
         torch.set_default_dtype(hf_config.dtype)
         torch.set_default_device("cuda")
