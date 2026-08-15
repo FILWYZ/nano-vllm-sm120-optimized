@@ -1,6 +1,7 @@
 import atexit
 from dataclasses import fields
 from time import perf_counter
+from typing import Any
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 import torch.multiprocessing as mp
@@ -32,6 +33,7 @@ class LLMEngine:
         self.tokenizer = AutoTokenizer.from_pretrained(config.model, use_fast=True)
         config.eos = self.tokenizer.eos_token_id
         self.scheduler = Scheduler(config)
+        self.last_metrics: dict[str, Any] = {}
         atexit.register(self.exit)
 
     def exit(self):
@@ -72,14 +74,26 @@ class LLMEngine:
         for prompt, sp in zip(prompts, sampling_params):
             self.add_request(prompt, sp)
         outputs = {}
+        prefill_seconds = decode_seconds = 0.0
+        prefill_tokens = decode_tokens = 0
+        prefill_iterations = decode_iterations = 0
+        started = perf_counter()
         prefill_throughput = decode_throughput = 0.
         while not self.is_finished():
             t = perf_counter()
             output, num_tokens = self.step()
             if num_tokens > 0:
-                prefill_throughput = num_tokens / (perf_counter() - t)
+                elapsed = perf_counter() - t
+                prefill_seconds += elapsed
+                prefill_tokens += num_tokens
+                prefill_iterations += 1
+                prefill_throughput = num_tokens / elapsed
             else:
-                decode_throughput = -num_tokens / (perf_counter() - t)
+                elapsed = perf_counter() - t
+                decode_seconds += elapsed
+                decode_tokens -= num_tokens
+                decode_iterations += 1
+                decode_throughput = -num_tokens / elapsed
             pbar.set_postfix({
                 "Prefill": f"{int(prefill_throughput)}tok/s",
                 "Decode": f"{int(decode_throughput)}tok/s",
@@ -90,4 +104,22 @@ class LLMEngine:
         pbar.close()
         outputs = [outputs[seq_id] for seq_id in sorted(outputs.keys())]
         outputs = [{"text": self.tokenizer.decode(token_ids), "token_ids": token_ids} for token_ids in outputs]
+        total_seconds = perf_counter() - started
+        output_tokens = sum(len(output["token_ids"]) for output in outputs)
+        self.last_metrics = {
+            "requests": len(prompts),
+            "prefill_tokens": prefill_tokens,
+            "decode_tokens": decode_tokens,
+            "output_tokens": output_tokens,
+            "prefill_iterations": prefill_iterations,
+            "decode_iterations": decode_iterations,
+            "prefill_seconds": prefill_seconds,
+            "decode_seconds": decode_seconds,
+            "total_seconds": total_seconds,
+            "prefill_tokens_per_second": prefill_tokens / prefill_seconds if prefill_seconds else 0.0,
+            "decode_tokens_per_second": decode_tokens / decode_seconds if decode_seconds else 0.0,
+            "output_tokens_per_second": output_tokens / total_seconds if total_seconds else 0.0,
+            "batch_ttft_seconds": prefill_seconds,
+            "mean_tpot_seconds": decode_seconds / decode_iterations if decode_iterations else 0.0,
+        }
         return outputs
