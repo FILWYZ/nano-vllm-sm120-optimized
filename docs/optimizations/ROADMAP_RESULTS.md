@@ -1,6 +1,7 @@
 # nano-vLLM 本地 SM120 优化结果
 
 > 面试级逐阶段讲解、实现证据链与优缺点分析见 [`ROADMAP_INTERVIEW_GUIDE_CN.md`](ROADMAP_INTERVIEW_GUIDE_CN.md)。
+> 相对 GitHub 上游的三轮直接 A/B 结果和简历口径见 [`M8_UPSTREAM_COMPARISON.md`](M8_UPSTREAM_COMPARISON.md) 与 [`RESUME_M8_CN.md`](RESUME_M8_CN.md)。
 
 ## 适用范围
 
@@ -19,8 +20,20 @@
 | M5 | `6e5441e` | `m5-continuous-batching` | 混合连续批处理 |
 | M6 | `3bcfe31` | `m6-prefix-cache` | 可观测的 LRU + 离线重排序 |
 | M7 | 由标签 `m7-final` 记录 | `m7-final` | 贪心/缓冲式采样 |
+| M8 | 由标签 `m8-upstream-proof` 记录 | `m8-upstream-proof` | 输出感知 KV Admission + 上游直接 A/B |
 
 每个阶段都可作为回滚点。机器可读的 JSON 和精简版性能分析摘要位于 `benchmarks/results`；体积较大的 Chrome Trace 文件未纳入版本控制。
+
+## M8 相对 GitHub 上游的直接证明
+
+在原仓库 README 定义的 256 请求、133,966 输出 Token 负载中，三轮中位结果为：
+
+| 版本 | 中位 tok/s | 中位耗时 | 相对加速 |
+|---|---:|---:|---:|
+| Upstream SM120 Compat `7aa1f25` | 247.66 | 540.92 s | 1.00× |
+| Optimized M8 Offline | 1,898.00 | 70.58 s | **7.66×** |
+
+该结论相对的是 GitHub 上游 `bb823b3` 派生的最小 SM120/SDPA 可运行基线，不是官方 `vllm-project/vllm`，也不是上游在 RTX 4070 原生 FlashAttention 环境中的性能。最终配置以约 10.1% 峰值 Allocated 显存增量换取 0 次抢占和 0 个重复 Prefill Token。
 
 ## 固定测试矩阵的核心结果
 

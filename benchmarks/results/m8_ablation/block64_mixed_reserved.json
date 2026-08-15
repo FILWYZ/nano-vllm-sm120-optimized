@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-08-15T13:36:37.993547+00:00",
+  "variant": "m8_reserve64_mixed",
+  "suite": "fixed",
+  "git_commit": "0a181f016d19593f75b5770566473d10e06c7664",
+  "working_directory": "/home/asus/projects/nano-vllm-baseline",
+  "environment": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375
+  },
+  "config": {
+    "model": "/mnt/c/Users/ASUS/Documents/ChatGPT/\u7b97\u5b50/models/Qwen3-0.6B",
+    "seed": 880064,
+    "temperature": 0.6,
+    "max_model_len": 1024,
+    "gpu_memory_utilization": 0.9,
+    "kvcache_block_size": 64,
+    "attention_backend": "flashinfer",
+    "enforce_eager_resolved": false
+  },
+  "workload": {
+    "requests": 64,
+    "input_tokens": 32768,
+    "expected_output_tokens": 16384,
+    "actual_output_tokens": 16384
+  },
+  "result": {
+    "init_seconds": 10.767864192999696,
+    "elapsed_seconds": 6.666047077997064,
+    "output_tokens_per_second": 2457.8284263967234,
+    "peak_allocated_gib": 6.4117631912231445,
+    "peak_reserved_gib": 6.626953125,
+    "output_sha256": "f967f39f69e4d5c4c4a5ac5604b235ef8a96dd1a7ffee54cc16726dfcdad6b20"
+  },
+  "engine_metrics": {
+    "requests": 64,
+    "prefill_tokens": 32768,
+    "decode_tokens": 16320,
+    "output_tokens": 16384,
+    "prefill_iterations": 3,
+    "decode_iterations": 509,
+    "prefill_seconds": 0.9974976549965504,
+    "decode_seconds": 5.658886994020577,
+    "total_seconds": 6.665817783999955,
+    "prefill_tokens_per_second": 32850.20254018875,
+    "decode_tokens_per_second": 2646.0320560749024,
+    "output_tokens_per_second": 2457.912971957727,
+    "batch_ttft_seconds": 0.9974976549965504,
+    "mean_tpot_seconds": 0.012069913369899961,
+    "mixed_seconds": 0.5088387379983033,
+    "mixed_iterations": 2,
+    "scheduler": {
+      "prefill_chunks": 64,
+      "mixed_batches": 2,
+      "prefill_only_batches": 1,
+      "decode_only_batches": 509,
+      "preemptions": 0
+    },
+    "prefix_cache": {
+      "queries": 3634,
+      "block_hits": 0,
+      "token_hits": 0,
+      "misses": 3634,
+      "hash_collisions": 0,
+      "cached_evictions": 704
+    }
+  }
+}

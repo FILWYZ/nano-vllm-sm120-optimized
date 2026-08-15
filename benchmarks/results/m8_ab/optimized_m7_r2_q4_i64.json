@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-08-15T12:50:56.191637+00:00",
+  "variant": "optimized_m7",
+  "suite": "fixed",
+  "git_commit": "24d86e67e91fdb94b7e499fdabf0b37851885e35",
+  "working_directory": "/home/asus/projects/nano-vllm-baseline",
+  "environment": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375
+  },
+  "config": {
+    "model": "/mnt/c/Users/ASUS/Documents/ChatGPT/\u7b97\u5b50/models/Qwen3-0.6B",
+    "seed": 830464,
+    "temperature": 0.6,
+    "max_model_len": 512,
+    "gpu_memory_utilization": 0.75,
+    "kvcache_block_size": 16,
+    "attention_backend": "flashinfer",
+    "enforce_eager_resolved": false
+  },
+  "workload": {
+    "requests": 4,
+    "input_tokens": 256,
+    "expected_output_tokens": 128,
+    "actual_output_tokens": 128
+  },
+  "result": {
+    "init_seconds": 10.105703494999034,
+    "elapsed_seconds": 0.1628156830010994,
+    "output_tokens_per_second": 786.1650526573395,
+    "peak_allocated_gib": 4.682707786560059,
+    "peak_reserved_gib": 4.810546875,
+    "output_sha256": "b59409c0b48a3175637e56466870ce82711b2b0724023140d2b686db2ca392f8"
+  }
+}
