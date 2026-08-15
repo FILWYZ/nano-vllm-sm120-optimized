@@ -17,10 +17,11 @@ def parse_args():
     parser.add_argument(
         "--output", default="benchmarks/results/m3_graph_parity.json"
     )
+    parser.add_argument("--temperature", type=float, default=0.1)
     return parser.parse_args()
 
 
-def run(model, prompts, enforce_eager, seed):
+def run(model, prompts, enforce_eager, seed, temperature):
     llm = LLM(
         model,
         attention_backend="flashinfer",
@@ -31,7 +32,9 @@ def run(model, prompts, enforce_eager, seed):
         gpu_memory_utilization=0.75,
     )
     torch.manual_seed(seed)
-    params = SamplingParams(temperature=0.1, ignore_eos=True, max_tokens=16)
+    params = SamplingParams(
+        temperature=temperature, ignore_eos=True, max_tokens=16
+    )
     outputs = llm.generate(prompts, params, use_tqdm=False)
     tokens = [output["token_ids"] for output in outputs]
     llm.exit()
@@ -51,8 +54,8 @@ def main():
         [rng.randint(10, 10000) for _ in range(255)]
         for _ in range(3)
     ]
-    eager = run(args.model, prompts, True, seed)
-    graphed = run(args.model, prompts, False, seed)
+    eager = run(args.model, prompts, True, seed, args.temperature)
+    graphed = run(args.model, prompts, False, seed, args.temperature)
     exact_match = eager == graphed
     matched_tokens = sum(
         sum(left == right for left, right in zip(eager_row, graph_row))
@@ -68,6 +71,7 @@ def main():
             "input_len": 255,
             "output_len": 16,
             "crosses_page_boundary": True,
+            "temperature": args.temperature,
         },
         "exact_match": exact_match,
         "matched_tokens": matched_tokens,

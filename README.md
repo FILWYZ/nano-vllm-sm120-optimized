@@ -50,10 +50,14 @@ llm = LLM(
 Use `attention_backend="sdpa"` for the readable compatibility path or
 `attention_backend="flashinfer"` for the optimized paged-attention path.
 FlashAttention remains optional for validated GPU/software combinations.
-FlashInfer and SDPA remain eager until M3 adds decode graph capture.
+FlashInfer uses bucketed decode CUDA Graphs; SDPA remains the eager reference.
 
 See [LOCAL_BASELINE.md](LOCAL_BASELINE.md) and run `bench_local.py` to reproduce
 the RTX 5060 Laptop baseline before making further optimizations.
+
+The complete local M0-M7 rationale, implementation notes, correctness gates,
+benchmarks, and rollback tags are indexed in
+[docs/optimizations/ROADMAP_RESULTS.md](docs/optimizations/ROADMAP_RESULTS.md).
 
 ## Model Download
 

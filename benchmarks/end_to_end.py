@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("--repeats", type=int, default=2)
     parser.add_argument("--enforce-eager", action="store_true")
     parser.add_argument("--seed", type=int, default=2026)
+    parser.add_argument("--temperature", type=float, default=0.6)
     return parser.parse_args()
 
 
@@ -55,7 +56,7 @@ def main():
     results = []
     for case_index, case in enumerate(DEFAULT_MATRIX):
         params = SamplingParams(
-            temperature=0.6,
+            temperature=args.temperature,
             ignore_eos=True,
             max_tokens=case["output_len"],
         )
@@ -111,6 +112,7 @@ def main():
             "kvcache_capacity_tokens": (
                 llm.model_runner.config.num_kvcache_blocks * args.block_size
             ),
+            "temperature": args.temperature,
         },
         "workloads": results,
     }
