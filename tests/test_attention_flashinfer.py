@@ -3,7 +3,9 @@ import unittest
 import torch
 import torch.nn.functional as F
 
-from nanovllm.layers.attention import Attention, set_attention_backend
+from nanovllm.layers.attention import (
+    Attention, set_attention_backend, store_kvcache,
+)
 from nanovllm.layers.flashinfer_backend import (
     flashinfer_available,
     reset_flashinfer_runtime,
@@ -51,6 +53,27 @@ class TestFlashInferAttention(unittest.TestCase):
                         device=self.device, dtype=self.dtype)
         v = torch.randn_like(k)
         return q, k, v
+
+    def test_kv_store_ignores_padded_slots(self):
+        page_size = 2
+        key = torch.randn(3, self.num_kv_heads, self.head_dim,
+                          device=self.device, dtype=self.dtype)
+        value = torch.randn_like(key)
+        k_cache = torch.full(
+            (2, page_size, self.num_kv_heads, self.head_dim), 7.0,
+            device=self.device, dtype=self.dtype,
+        )
+        v_cache = torch.full_like(k_cache, 11.0)
+        slots = torch.tensor([0, -1, 3], device=self.device, dtype=torch.int32)
+
+        store_kvcache(key, value, k_cache, v_cache, slots)
+
+        torch.testing.assert_close(k_cache.view(-1, self.num_kv_heads, self.head_dim)[0], key[0])
+        torch.testing.assert_close(k_cache.view(-1, self.num_kv_heads, self.head_dim)[3], key[2])
+        torch.testing.assert_close(v_cache.view(-1, self.num_kv_heads, self.head_dim)[0], value[0])
+        torch.testing.assert_close(v_cache.view(-1, self.num_kv_heads, self.head_dim)[3], value[2])
+        self.assertTrue(torch.all(k_cache.view(-1, self.num_kv_heads, self.head_dim)[1:3] == 7))
+        self.assertTrue(torch.all(v_cache.view(-1, self.num_kv_heads, self.head_dim)[1:3] == 11))
 
     def test_ragged_prefill(self):
         q1, k1, v1 = self.random_qkv(17)

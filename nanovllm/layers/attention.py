@@ -166,7 +166,7 @@ class Attention(nn.Module):
         context = get_context()
         k_cache, v_cache = self.k_cache, self.v_cache
         if k_cache.numel() and v_cache.numel():
-            if self.backend == "flash":
+            if self.backend in {"flash", "flashinfer"}:
                 store_kvcache(k, v, k_cache, v_cache, context.slot_mapping)
             else:
                 store_kvcache_torch(k, v, k_cache, v_cache, context.slot_mapping)

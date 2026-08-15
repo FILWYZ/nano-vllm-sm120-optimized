@@ -36,6 +36,8 @@ class FlashInferRuntime:
         self.planned_context = None
         self.planned_mode = None
         self.planned_signature = None
+        self.output_buffers = {}
+        self.page_columns = {}
 
     def _workspace(self, device):
         if self.workspace is None or self.workspace.device != device:
@@ -46,11 +48,14 @@ class FlashInferRuntime:
             self.decode = None
         return self.workspace
 
-    @staticmethod
-    def _page_metadata(block_tables, seq_lens, page_size):
+    def _page_metadata(self, block_tables, seq_lens, page_size):
         seq_lens = seq_lens.to(dtype=torch.int32)
         num_pages = torch.div(seq_lens + page_size - 1, page_size, rounding_mode="floor")
-        page_columns = torch.arange(block_tables.size(1), device=block_tables.device)
+        key = (block_tables.device, block_tables.size(1))
+        page_columns = self.page_columns.get(key)
+        if page_columns is None:
+            page_columns = torch.arange(block_tables.size(1), device=block_tables.device)
+            self.page_columns[key] = page_columns
         page_mask = page_columns.unsqueeze(0) < num_pages.unsqueeze(1)
         indices = block_tables[page_mask].to(dtype=torch.int32)
         indptr = torch.cat((
@@ -135,22 +140,32 @@ class FlashInferRuntime:
         self.planned_signature = signature
         return mode
 
+    def _output_buffer(self, q):
+        shape = tuple(q.shape)
+        key = (q.device, q.dtype, shape)
+        output = self.output_buffers.get(key)
+        if output is None:
+            output = torch.empty(shape, dtype=q.dtype, device=q.device)
+            self.output_buffers[key] = output
+        return output
+
     def forward(self, q, k, v, k_cache, v_cache, context,
                 num_heads, num_kv_heads, head_dim, scale):
         mode = self._plan(
             context, q, k, k_cache, num_heads, num_kv_heads, head_dim, scale
         )
         if mode == "ragged_prefill":
-            return self.ragged_prefill.run(q, k, v)
+            return self.ragged_prefill.run(q, k, v, out=self._output_buffer(q))
         if mode == "paged_prefill":
-            return self.paged_prefill.run(q, (k_cache, v_cache))
-        return self.decode.run(q, (k_cache, v_cache))
+            return self.paged_prefill.run(q, (k_cache, v_cache), out=self._output_buffer(q))
+        return self.decode.run(q, (k_cache, v_cache), out=self._output_buffer(q))
 
     def reset(self):
         self.planned_context = None
         self.planned_mode = None
         self.planned_signature = None
-
+        self.output_buffers.clear()
+        self.page_columns.clear()
 
 _RUNTIME = FlashInferRuntime()
 

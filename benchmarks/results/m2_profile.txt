@@ -1,0 +1,95 @@
+CPU HOTSPOTS
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg       CPU Mem  Self CPU Mem      CUDA Mem  Self CUDA Mem    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                               aten::mm        11.25%      31.501ms        11.25%      31.501ms      17.423us           0 B           0 B     787.84 MB     787.84 MB          1808  
+## Call CompiledFxGraph fcal53xcprs542kvdr4a4ndouvxt...         8.19%      22.941ms        13.49%      37.772ms      42.156us           0 B           0 B     250.25 MB     250.25 MB           896  
+                               TorchDynamo Cache Lookup         7.54%      21.120ms         7.54%      21.120ms       7.765us           0 B           0 B           0 B           0 B          2720  
+                                            aten::copy_         7.08%      19.831ms         7.08%      19.831ms     104.375us           0 B           0 B           0 B           0 B           190  
+## Call CompiledFxGraph flrichiikfjd7vkw5lgmsuoyti2j...         6.87%      19.248ms        11.49%      32.190ms      35.926us           0 B           0 B     187.69 MB     187.69 MB           896  
+                             Torch-Compiled Region: 2/1         5.73%      16.050ms        21.53%      60.304ms      67.304us           0 B           0 B     250.25 MB           0 B           896  
+                                      Pregraph bytecode         5.55%      15.538ms         5.55%      15.538ms       5.713us           0 B           0 B           0 B           0 B          2720  
+## Call CompiledFxGraph fyffo33gn2qy5554i35h5ogoz4is...         5.55%      15.538ms         9.73%      27.246ms      60.816us           0 B           0 B     187.69 MB     187.69 MB           448  
+     triton_per_fused__to_copy_add_mean_mul_pow_rsqrt_0         5.41%      15.144ms         5.41%      15.144ms      16.605us           0 B           0 B           0 B           0 B           912  
+                             Torch-Compiled Region: 0/3         4.97%      13.904ms        19.44%      54.434ms      60.752us           0 B           0 B     187.69 MB           0 B           896  
+     triton_red_fused__to_copy_add_mean_mul_pow_rsqrt_0         4.62%      12.942ms         4.62%      12.942ms      14.444us           0 B           0 B           0 B           0 B           896  
+## Call CompiledFxGraph fev6m3s4w3coi7zxuarkojtw5c5y...         3.26%       9.138ms         5.34%      14.958ms      33.389us           0 B           0 B     187.69 MB     187.69 MB           448  
+                             Torch-Compiled Region: 3/1         2.62%       7.327ms         9.03%      25.290ms      56.450us           0 B           0 B     187.69 MB           0 B           448  
+                 AOTDispatcher Runtime Wrapper Prologue         2.35%       6.576ms         2.35%       6.576ms       2.418us           0 B           0 B           0 B           0 B          2720  
+                             Torch-Compiled Region: 1/1         2.31%       6.475ms        13.44%      37.639ms      84.015us           0 B           0 B     187.69 MB           0 B           448  
+triton_poi_fused__to_copy_add_cat_index_mul_split_su...         2.31%       6.466ms         2.31%       6.466ms      14.434us           0 B           0 B           0 B           0 B           448  
+                      triton_poi_fused_mul_silu_split_0         2.08%       5.820ms         2.08%       5.820ms      12.992us           0 B           0 B           0 B           0 B           448  
+triton_poi_fused__to_copy_add_cat_index_mul_split_su...         1.87%       5.242ms         1.87%       5.242ms      11.700us           0 B           0 B           0 B           0 B           448  
+                                           aten::linear         1.21%       3.377ms        15.84%      44.364ms      24.538us           0 B           0 B     787.84 MB           0 B          1808  
+                                                aten::t         1.11%       3.097ms         2.57%       7.192ms       3.945us           0 B           0 B           0 B           0 B          1823  
+                                        aten::transpose         0.97%       2.711ms         1.46%       4.096ms       2.247us           0 B           0 B           0 B           0 B          1823  
+                                           aten::matmul         0.83%       2.337ms        12.08%      33.839ms      18.716us           0 B           0 B     787.84 MB           0 B          1808  
+                                       aten::as_strided         0.69%       1.943ms         0.69%       1.943ms       0.590us           0 B           0 B           0 B           0 B          3295  
+## Call CompiledFxGraph fgcsmddhpcv7uyh2y6drppzoalun...         0.59%       1.658ms         1.23%       3.431ms     214.444us           0 B           0 B       8.00 KB       8.00 KB            16  
+                                 aten::split_with_sizes         0.56%       1.562ms         0.73%       2.034ms       4.540us           0 B           0 B           0 B           0 B           448  
+                                          aten::nonzero         0.53%       1.473ms         0.58%       1.637ms     109.106us           0 B           0 B       7.50 KB           0 B            15  
+                                             aten::view         0.45%       1.272ms         0.45%       1.272ms       0.698us           0 B           0 B           0 B           0 B          1824  
+                                          aten::flatten         0.39%       1.104ms         0.58%       1.621ms       3.619us           0 B           0 B           0 B           0 B           448  
+                                     aten::index_select         0.26%     726.116us         0.31%     859.523us      53.720us           0 B           0 B       2.23 MB           0 B            16  
+                                         aten::_to_copy         0.22%     618.915us         7.45%      20.850ms     109.739us       2.18 KB           0 B      74.50 KB           0 B           190  
+## Call CompiledFxGraph feuvxkiihhpornpltlqulunaoepq...         0.19%     518.202us         0.30%     831.051us      51.941us           0 B           0 B       2.23 MB       2.23 MB            16  
+                             Torch-Compiled Region: 0/2         0.18%     505.331us         0.54%       1.506ms      94.151us           0 B           0 B       2.23 MB           0 B            16  
+                                              aten::sub         0.16%     437.206us         0.19%     528.808us       8.529us         992 B         932 B      15.50 KB      15.50 KB            62  
+                                              aten::add         0.15%     431.959us         0.15%     431.959us       9.599us         480 B         480 B      15.00 KB      15.00 KB            45  
+                                    aten::empty_strided         0.14%     400.345us         0.14%     400.345us       2.107us       2.18 KB       2.18 KB      74.50 KB      74.50 KB           190  
+                             Torch-Compiled Region: 4/1         0.14%     380.226us         1.43%       4.011ms     250.706us           0 B           0 B       8.00 KB           0 B            16  
+                                          aten::randint         0.13%     359.990us         0.26%     720.320us      45.020us           0 B           0 B           0 B           0 B            16  
+                                          aten::random_         0.12%     347.855us         0.12%     347.855us      21.741us           0 B           0 B           0 B           0 B            16  
+                                            aten::index         0.12%     344.777us         0.76%       2.130ms     133.098us           0 B           0 B      23.50 KB      15.50 KB            16  
+                                            aten::empty         0.11%     309.721us         0.11%     309.721us       1.973us           0 B           0 B       7.50 KB       7.50 KB           157  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 280.034ms
+
+
+CUDA HOTSPOTS
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg       CPU Mem  Self CPU Mem      CUDA Mem  Self CUDA Mem    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                            aten::empty         0.11%     309.721us         0.11%     309.721us       1.973us           0 B           0 B       7.50 KB       7.50 KB           157  
+                                               aten::to         0.09%     242.022us         7.53%      21.092ms      53.670us       2.18 KB           0 B      74.50 KB           0 B           393  
+                                       aten::lift_fresh         0.00%      13.499us         0.00%      13.499us       0.141us           0 B           0 B           0 B           0 B            96  
+                                          aten::detach_         0.02%      56.349us         0.03%      94.611us       0.986us           0 B           0 B           0 B           0 B            96  
+                                                detach_         0.01%      38.262us         0.01%      38.262us       0.399us           0 B           0 B           0 B           0 B            96  
+                                         aten::_to_copy         0.22%     618.915us         7.45%      20.850ms     109.739us       2.18 KB           0 B      74.50 KB           0 B           190  
+                                    aten::empty_strided         0.14%     400.345us         0.14%     400.345us       2.107us       2.18 KB       2.18 KB      74.50 KB      74.50 KB           190  
+                                            aten::copy_         7.08%      19.831ms         7.08%      19.831ms     104.375us           0 B           0 B           0 B           0 B           190  
+                                        aten::embedding         0.02%      56.315us         0.33%     915.838us      57.240us           0 B           0 B       2.23 MB           0 B            16  
+                                     aten::index_select         0.26%     726.116us         0.31%     859.523us      53.720us           0 B           0 B       2.23 MB           0 B            16  
+                                          aten::resize_         0.03%      82.799us         0.03%      82.799us       1.762us           0 B           0 B       2.24 MB       2.24 MB            47  
+                                             aten::view         0.45%       1.272ms         0.45%       1.272ms       0.698us           0 B           0 B           0 B           0 B          1824  
+                                           aten::expand         0.00%       5.696us         0.00%       7.766us       7.766us           0 B           0 B           0 B           0 B             1  
+                                       aten::as_strided         0.69%       1.943ms         0.69%       1.943ms       0.590us           0 B           0 B           0 B           0 B          3295  
+                                           aten::gather         0.02%      48.067us         0.02%      49.675us      49.675us           0 B           0 B           0 B           0 B             1  
+                               TorchDynamo Cache Lookup         7.54%      21.120ms         7.54%      21.120ms       7.765us           0 B           0 B           0 B           0 B          2720  
+                             Torch-Compiled Region: 0/2         0.18%     505.331us         0.54%       1.506ms      94.151us           0 B           0 B       2.23 MB           0 B            16  
+                                      Pregraph bytecode         5.55%      15.538ms         5.55%      15.538ms       5.713us           0 B           0 B           0 B           0 B          2720  
+                 AOTDispatcher Runtime Wrapper Prologue         2.35%       6.576ms         2.35%       6.576ms       2.418us           0 B           0 B           0 B           0 B          2720  
+## Call CompiledFxGraph feuvxkiihhpornpltlqulunaoepq...         0.19%     518.202us         0.30%     831.051us      51.941us           0 B           0 B       2.23 MB       2.23 MB            16  
+     triton_per_fused__to_copy_add_mean_mul_pow_rsqrt_0         5.41%      15.144ms         5.41%      15.144ms      16.605us           0 B           0 B           0 B           0 B           912  
+                                           aten::linear         1.21%       3.377ms        15.84%      44.364ms      24.538us           0 B           0 B     787.84 MB           0 B          1808  
+                                                aten::t         1.11%       3.097ms         2.57%       7.192ms       3.945us           0 B           0 B           0 B           0 B          1823  
+                                        aten::transpose         0.97%       2.711ms         1.46%       4.096ms       2.247us           0 B           0 B           0 B           0 B          1823  
+                                           aten::matmul         0.83%       2.337ms        12.08%      33.839ms      18.716us           0 B           0 B     787.84 MB           0 B          1808  
+                                               aten::mm        11.25%      31.501ms        11.25%      31.501ms      17.423us           0 B           0 B     787.84 MB     787.84 MB          1808  
+                                 aten::split_with_sizes         0.56%       1.562ms         0.73%       2.034ms       4.540us           0 B           0 B           0 B           0 B           448  
+                             Torch-Compiled Region: 0/3         4.97%      13.904ms        19.44%      54.434ms      60.752us           0 B           0 B     187.69 MB           0 B           896  
+## Call CompiledFxGraph flrichiikfjd7vkw5lgmsuoyti2j...         6.87%      19.248ms        11.49%      32.190ms      35.926us           0 B           0 B     187.69 MB     187.69 MB           896  
+     triton_red_fused__to_copy_add_mean_mul_pow_rsqrt_0         4.62%      12.942ms         4.62%      12.942ms      14.444us           0 B           0 B           0 B           0 B           896  
+                             Torch-Compiled Region: 1/1         2.31%       6.475ms        13.44%      37.639ms      84.015us           0 B           0 B     187.69 MB           0 B           448  
+## Call CompiledFxGraph fyffo33gn2qy5554i35h5ogoz4is...         5.55%      15.538ms         9.73%      27.246ms      60.816us           0 B           0 B     187.69 MB     187.69 MB           448  
+triton_poi_fused__to_copy_add_cat_index_mul_split_su...         2.31%       6.466ms         2.31%       6.466ms      14.434us           0 B           0 B           0 B           0 B           448  
+triton_poi_fused__to_copy_add_cat_index_mul_split_su...         1.87%       5.242ms         1.87%       5.242ms      11.700us           0 B           0 B           0 B           0 B           448  
+                                               [memory]         0.00%       0.000us         0.00%       0.000us       0.000us      -4.44 KB      -4.44 KB      -1.57 GB      -1.57 GB          6502  
+                                           aten::select         0.02%      61.465us         0.03%      71.791us       2.316us           0 B           0 B           0 B           0 B            31  
+                                             aten::item         0.00%       2.329us         0.00%       3.379us       3.379us           0 B           0 B           0 B           0 B             1  
+                              aten::_local_scalar_dense         0.00%       1.050us         0.00%       1.050us       1.050us           0 B           0 B           0 B           0 B             1  
+                                            aten::slice         0.03%      74.710us         0.04%     101.639us       2.117us           0 B           0 B           0 B           0 B            48  
+                                              aten::sub         0.16%     437.206us         0.19%     528.808us       8.529us         992 B         932 B      15.50 KB      15.50 KB            62  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 280.034ms
+
