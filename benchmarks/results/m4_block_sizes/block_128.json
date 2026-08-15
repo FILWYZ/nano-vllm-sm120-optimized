@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "timestamp_utc": "2026-08-15T06:19:59.125411+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "a95c4081b24cf4d7bc4476e46627feb5066cae93"
+  },
+  "config": {
+    "model": "/mnt/c/Users/ASUS/Documents/ChatGPT/算子/models/Qwen3-0.6B",
+    "requested_backend": "flashinfer",
+    "resolved_backend": "flashinfer",
+    "max_model_len": 512,
+    "gpu_memory_utilization": 0.75,
+    "warmup_repeats": 1,
+    "repeats": 1,
+    "enforce_eager": false,
+    "kvcache_block_size": 128,
+    "num_kvcache_blocks": 247,
+    "kvcache_capacity_tokens": 31616
+  },
+  "workloads": [
+    {
+      "requests": 1,
+      "input_len": 64,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 1,
+          "prefill_tokens": 64,
+          "decode_tokens": 31,
+          "output_tokens": 32,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.018867561000661226,
+          "decode_seconds": 0.14685518699388922,
+          "total_seconds": 0.1662099679997482,
+          "prefill_tokens_per_second": 3392.065354804316,
+          "decode_tokens_per_second": 211.09230551924557,
+          "output_tokens_per_second": 192.5275624867967,
+          "batch_ttft_seconds": 0.018867561000661226,
+          "mean_tpot_seconds": 0.004737264096577072,
+          "peak_allocated_gib": 4.704322338104248,
+          "peak_reserved_gib": 4.787109375
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 3392.065354804316,
+        "decode_tokens_per_second": 211.09230551924557,
+        "output_tokens_per_second": 192.5275624867967,
+        "batch_ttft_seconds": 0.018867561000661226,
+        "mean_tpot_seconds": 0.004737264096577072,
+        "peak_allocated_gib": 4.704322338104248,
+        "peak_reserved_gib": 4.787109375
+      }
+    },
+    {
+      "requests": 4,
+      "input_len": 64,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 4,
+          "prefill_tokens": 256,
+          "decode_tokens": 124,
+          "output_tokens": 128,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.019599928999923577,
+          "decode_seconds": 0.14335418400241906,
+          "total_seconds": 0.16346723700007715,
+          "prefill_tokens_per_second": 13061.271803637563,
+          "decode_tokens_per_second": 864.9904490956994,
+          "output_tokens_per_second": 783.0315257603552,
+          "batch_ttft_seconds": 0.019599928999923577,
+          "mean_tpot_seconds": 0.004624328516207066,
+          "peak_allocated_gib": 4.7117719650268555,
+          "peak_reserved_gib": 4.791015625
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 13061.271803637563,
+        "decode_tokens_per_second": 864.9904490956994,
+        "output_tokens_per_second": 783.0315257603552,
+        "batch_ttft_seconds": 0.019599928999923577,
+        "mean_tpot_seconds": 0.004624328516207066,
+        "peak_allocated_gib": 4.7117719650268555,
+        "peak_reserved_gib": 4.791015625
+      }
+    },
+    {
+      "requests": 8,
+      "input_len": 64,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 8,
+          "prefill_tokens": 512,
+          "decode_tokens": 248,
+          "output_tokens": 256,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.020613568999579,
+          "decode_seconds": 0.14875934400060942,
+          "total_seconds": 0.16983102100039105,
+          "prefill_tokens_per_second": 24838.00840167255,
+          "decode_tokens_per_second": 1667.122167458496,
+          "output_tokens_per_second": 1507.3806804671483,
+          "batch_ttft_seconds": 0.020613568999579,
+          "mean_tpot_seconds": 0.004798688516148691,
+          "peak_allocated_gib": 4.7200775146484375,
+          "peak_reserved_gib": 4.8125
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 24838.00840167255,
+        "decode_tokens_per_second": 1667.122167458496,
+        "output_tokens_per_second": 1507.3806804671483,
+        "batch_ttft_seconds": 0.020613568999579,
+        "mean_tpot_seconds": 0.004798688516148691,
+        "peak_allocated_gib": 4.7200775146484375,
+        "peak_reserved_gib": 4.8125
+      }
+    },
+    {
+      "requests": 1,
+      "input_len": 256,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 1,
+          "prefill_tokens": 256,
+          "decode_tokens": 31,
+          "output_tokens": 32,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.021356119000301987,
+          "decode_seconds": 0.14496442299696355,
+          "total_seconds": 0.16670872200029407,
+          "prefill_tokens_per_second": 11987.196737215223,
+          "decode_tokens_per_second": 213.84557230741595,
+          "output_tokens_per_second": 191.95156447749358,
+          "batch_ttft_seconds": 0.021356119000301987,
+          "mean_tpot_seconds": 0.004676271709579469,
+          "peak_allocated_gib": 4.7137250900268555,
+          "peak_reserved_gib": 4.8125
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 11987.196737215223,
+        "decode_tokens_per_second": 213.84557230741595,
+        "output_tokens_per_second": 191.95156447749358,
+        "batch_ttft_seconds": 0.021356119000301987,
+        "mean_tpot_seconds": 0.004676271709579469,
+        "peak_allocated_gib": 4.7137250900268555,
+        "peak_reserved_gib": 4.8125
+      }
+    },
+    {
+      "requests": 4,
+      "input_len": 256,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 4,
+          "prefill_tokens": 1024,
+          "decode_tokens": 124,
+          "output_tokens": 128,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.033193452999512374,
+          "decode_seconds": 0.15203234999808046,
+          "total_seconds": 0.18562159500015696,
+          "prefill_tokens_per_second": 30849.456970175503,
+          "decode_tokens_per_second": 815.6158870238183,
+          "output_tokens_per_second": 689.5749387343201,
+          "batch_ttft_seconds": 0.033193452999512374,
+          "mean_tpot_seconds": 0.004904269354776789,
+          "peak_allocated_gib": 4.736810684204102,
+          "peak_reserved_gib": 4.8125
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 30849.456970175503,
+        "decode_tokens_per_second": 815.6158870238183,
+        "output_tokens_per_second": 689.5749387343201,
+        "batch_ttft_seconds": 0.033193452999512374,
+        "mean_tpot_seconds": 0.004904269354776789,
+        "peak_allocated_gib": 4.736810684204102,
+        "peak_reserved_gib": 4.8125
+      }
+    },
+    {
+      "requests": 8,
+      "input_len": 256,
+      "output_len": 32,
+      "repeats": [
+        {
+          "requests": 8,
+          "prefill_tokens": 2048,
+          "decode_tokens": 248,
+          "output_tokens": 256,
+          "prefill_iterations": 1,
+          "decode_iterations": 31,
+          "prefill_seconds": 0.061026881999168836,
+          "decode_seconds": 0.16448210400085372,
+          "total_seconds": 0.22599944100056746,
+          "prefill_tokens_per_second": 33558.981434245536,
+          "decode_tokens_per_second": 1507.7628141157095,
+          "output_tokens_per_second": 1132.7461646215188,
+          "batch_ttft_seconds": 0.061026881999168836,
+          "mean_tpot_seconds": 0.0053058743226081844,
+          "peak_allocated_gib": 4.77198600769043,
+          "peak_reserved_gib": 4.875
+        }
+      ],
+      "mean": {
+        "prefill_tokens_per_second": 33558.981434245536,
+        "decode_tokens_per_second": 1507.7628141157095,
+        "output_tokens_per_second": 1132.7461646215188,
+        "batch_ttft_seconds": 0.061026881999168836,
+        "mean_tpot_seconds": 0.0053058743226081844,
+        "peak_allocated_gib": 4.77198600769043,
+        "peak_reserved_gib": 4.875
+      }
+    }
+  ]
+}

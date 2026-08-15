@@ -25,6 +25,7 @@ def parse_args():
                         choices=["auto", "sdpa", "flashinfer", "flash"])
     parser.add_argument("--max-model-len", type=int, default=512)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
+    parser.add_argument("--block-size", type=int, default=16)
     parser.add_argument("--warmup-repeats", type=int, default=1)
     parser.add_argument("--repeats", type=int, default=2)
     parser.add_argument("--enforce-eager", action="store_true")
@@ -49,6 +50,7 @@ def main():
         max_num_batched_tokens=max(2048, args.max_model_len * max_requests),
         max_num_seqs=max_requests,
         gpu_memory_utilization=args.gpu_memory_utilization,
+        kvcache_block_size=args.block_size,
     )
     results = []
     for case_index, case in enumerate(DEFAULT_MATRIX):
@@ -103,8 +105,13 @@ def main():
             "gpu_memory_utilization": args.gpu_memory_utilization,
             "warmup_repeats": args.warmup_repeats,
             "repeats": args.repeats,
-        },
             "enforce_eager": args.enforce_eager,
+            "kvcache_block_size": args.block_size,
+            "num_kvcache_blocks": llm.model_runner.config.num_kvcache_blocks,
+            "kvcache_capacity_tokens": (
+                llm.model_runner.config.num_kvcache_blocks * args.block_size
+            ),
+        },
         "workloads": results,
     }
     write_json(args.output, payload)
