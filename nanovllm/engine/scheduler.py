@@ -38,8 +38,11 @@ class Scheduler:
     def _schedule_decode(self, scheduled_seqs):
         decode_tokens = 0
         candidates = len(self.running)
+        scheduled_running = []
         for _ in range(candidates):
             if len(scheduled_seqs) >= self.max_num_seqs:
+                break
+            if not self.running:
                 break
             seq = self.running.popleft()
             while not self.block_manager.can_append(seq) and self.running:
@@ -51,8 +54,9 @@ class Scheduler:
             seq.is_prefill = False
             self.block_manager.may_append(seq)
             scheduled_seqs.append(seq)
-            self.running.append(seq)
+            scheduled_running.append(seq)
             decode_tokens += 1
+        self.running.extend(scheduled_running)
         return decode_tokens
 
     def _schedule_prefill(self, scheduled_seqs, used_tokens):

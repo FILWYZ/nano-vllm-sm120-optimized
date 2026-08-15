@@ -79,7 +79,14 @@ def store_kvcache(key: torch.Tensor, value: torch.Tensor, k_cache: torch.Tensor,
     assert key.stride(-1) == 1 and value.stride(-1) == 1
     assert key.stride(1) == head_dim and value.stride(1) == head_dim
     assert k_cache.stride(1) == D and v_cache.stride(1) == D
-    assert slot_mapping.numel() == N
+    if slot_mapping.numel() != N:
+        context = get_context()
+        raise AssertionError(
+            f"KV slot mismatch: slots={slot_mapping.numel()} tokens={N} "
+            f"is_prefill={context.is_prefill} "
+            f"cu_q={context.cu_seqlens_q.tolist() if context.cu_seqlens_q is not None else None} "
+            f"cu_k={context.cu_seqlens_k.tolist() if context.cu_seqlens_k is not None else None}"
+        )
     store_kvcache_kernel[(N,)](key, key.stride(0), value, value.stride(0), k_cache, v_cache, slot_mapping, D)
 
 

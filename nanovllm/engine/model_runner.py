@@ -159,6 +159,12 @@ class ModelRunner:
             max_seqlen_q = max(seqlen_q, max_seqlen_q)
             max_seqlen_k = max(seqlen_k, max_seqlen_k)
             if not seq.block_table:    # warmup
+                if hasattr(self, "kv_cache"):
+                    raise AssertionError(
+                        f"scheduled sequence has no KV blocks: seq_id={seq.seq_id} "
+                        f"is_prefill={seq.is_prefill} start={start} end={end} "
+                        f"num_tokens={seq.num_tokens} status={seq.status}"
+                    )
                 continue
             start_block = start // self.block_size
             end_block = (end + self.block_size - 1) // self.block_size

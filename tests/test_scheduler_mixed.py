@@ -88,6 +88,26 @@ class TestMixedScheduler(unittest.TestCase):
         self.assertEqual(list(scheduler.waiting), [first, second])
         self.assertEqual(scheduler.metrics["prefill_chunks"], 2)
 
+    def test_decode_candidate_cannot_preempt_already_scheduled_sequence(self):
+        constrained = config()
+        constrained.num_kvcache_blocks = 4
+        scheduler = Scheduler(constrained)
+        first = self.add_running(scheduler, length=20)
+        second = self.add_running(scheduler, length=17)
+        self.assertEqual(len(scheduler.block_manager.free_block_ids), 0)
+
+        scheduled, uses_prefill_path = scheduler.schedule()
+
+        self.assertTrue(uses_prefill_path)
+        self.assertEqual(scheduled, [first, second])
+        self.assertIn(first, scheduler.running)
+        self.assertTrue(first.block_table)
+        self.assertIn(second, scheduler.running)
+        self.assertTrue(second.block_table)
+        self.assertEqual(second.status, SequenceStatus.RUNNING)
+        self.assertEqual(scheduler.metrics["preemptions"], 1)
+        self.assertTrue(all(seq.block_table for seq in scheduled))
+
 
 if __name__ == "__main__":
     unittest.main()
