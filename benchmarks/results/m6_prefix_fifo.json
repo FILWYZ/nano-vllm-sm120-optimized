@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "timestamp_utc": "2026-08-15T06:41:01.329709+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "6e5441e7b5ab2df1522cd2097474aeae9d14aa63"
+  },
+  "policy": "fifo",
+  "reorder": false,
+  "workload": {
+    "prefix_families": 3,
+    "repeats_per_family": 4,
+    "shared_prefix_tokens": 64,
+    "unique_suffix_tokens": 16,
+    "block_size": 16,
+    "num_kvcache_blocks": 12
+  },
+  "prefill_tokens": 672,
+  "prefill_seconds": 0.8458946119999382,
+  "total_seconds": 0.8464706479999222,
+  "output_tokens_per_second": 14.176510465370681,
+  "cache": {
+    "queries": 12,
+    "block_hits": 18,
+    "token_hits": 288,
+    "misses": 12,
+    "hash_collisions": 0,
+    "cached_evictions": 30
+  },
+  "block_hit_rate": 0.6,
+  "output_tokens": [
+    [
+      4133
+    ],
+    [
+      8303
+    ],
+    [
+      198
+    ],
+    [
+      11
+    ],
+    [
+      65
+    ],
+    [
+      198
+    ],
+    [
+      233
+    ],
+    [
+      319
+    ],
+    [
+      198
+    ],
+    [
+      198
+    ],
+    [
+      897
+    ],
+    [
+      72
+    ]
+  ]
+}

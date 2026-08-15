@@ -116,7 +116,13 @@ class ModelRunner:
         num_kv_heads = hf_config.num_key_value_heads // self.world_size
         head_dim = getattr(hf_config, "head_dim", hf_config.hidden_size // hf_config.num_attention_heads)
         block_bytes = 2 * hf_config.num_hidden_layers * self.block_size * num_kv_heads * head_dim * hf_config.dtype.itemsize
-        config.num_kvcache_blocks = int(total * config.gpu_memory_utilization - used - peak + current) // block_bytes
+        available_blocks = int(
+            total * config.gpu_memory_utilization - used - peak + current
+        ) // block_bytes
+        config.num_kvcache_blocks = (
+            min(config.num_kvcache_blocks, available_blocks)
+            if config.num_kvcache_blocks > 0 else available_blocks
+        )
         assert config.num_kvcache_blocks > 0
         self.kv_cache = torch.empty(2, hf_config.num_hidden_layers, config.num_kvcache_blocks, self.block_size, num_kv_heads, head_dim)
         layer_id = 0

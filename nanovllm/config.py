@@ -19,6 +19,7 @@ class Config:
     num_kvcache_blocks: int = -1
     max_prefill_chunk_size: int = 512
     enable_mixed_batching: bool = True
+    prefix_cache_policy: str = "lru"
 
     def __post_init__(self):
         assert os.path.isdir(self.model)
@@ -31,3 +32,4 @@ class Config:
         self.hf_config = AutoConfig.from_pretrained(self.model)
         assert self.max_prefill_chunk_size > 0
         self.max_model_len = min(self.max_model_len, self.hf_config.max_position_embeddings)
+        assert self.prefix_cache_policy in {"lru", "fifo"}

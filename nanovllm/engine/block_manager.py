@@ -25,12 +25,22 @@ class Block:
 
 class BlockManager:
 
-    def __init__(self, num_blocks: int, block_size: int):
+    def __init__(self, num_blocks: int, block_size: int, policy: str = "lru"):
         self.block_size = block_size
+        self.policy = policy
         self.blocks: list[Block] = [Block(i) for i in range(num_blocks)]
         self.hash_to_block_id: dict[int, int] = dict()
         self.free_block_ids: deque[int] = deque(range(num_blocks))
         self.used_block_ids: set[int] = set()
+
+        self.metrics = {
+            "queries": 0,
+            "block_hits": 0,
+            "token_hits": 0,
+            "misses": 0,
+            "hash_collisions": 0,
+            "cached_evictions": 0,
+        }
 
     @classmethod
     def compute_hash(cls, token_ids: list[int], prefix: int = -1):
@@ -45,6 +55,7 @@ class BlockManager:
         block = self.blocks[block_id]
         assert block.ref_count == 0
         if block.hash != -1 and self.hash_to_block_id.get(block.hash) == block_id:
+            self.metrics["cached_evictions"] += 1
             del self.hash_to_block_id[block.hash]
         block.reset()
         self.used_block_ids.add(block_id)
@@ -57,14 +68,25 @@ class BlockManager:
 
     def can_allocate(self, seq: Sequence) -> int:
         h = -1
+        self.metrics["queries"] += 1
         num_cached_blocks = 0
         num_new_blocks = seq.num_blocks
         for i in range(seq.num_blocks - 1):
             token_ids = seq.block(i)
             h = self.compute_hash(token_ids, h)
             block_id = self.hash_to_block_id.get(h, -1)
-            if block_id == -1 or self.blocks[block_id].token_ids != token_ids:
+            if block_id == -1:
+                self.metrics["misses"] += 1
                 break
+            if self.blocks[block_id].token_ids != token_ids:
+                self.metrics["hash_collisions"] += 1
+                self.metrics["misses"] += 1
+                break
+            self.metrics["block_hits"] += 1
+            self.metrics["token_hits"] += self.block_size
+            if self.policy == "lru" and block_id in self.free_block_ids:
+                self.free_block_ids.remove(block_id)
+                self.free_block_ids.append(block_id)
             num_cached_blocks += 1
             if block_id in self.used_block_ids:
                 num_new_blocks -= 1

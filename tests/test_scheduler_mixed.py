@@ -13,6 +13,7 @@ def config(enable_mixed_batching=True, chunk_size=32):
         kvcache_block_size=16,
         num_kvcache_blocks=64,
         max_prefill_chunk_size=chunk_size,
+        prefix_cache_policy="lru",
         enable_mixed_batching=enable_mixed_batching,
     )
 

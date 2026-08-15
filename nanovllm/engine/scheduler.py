@@ -14,7 +14,10 @@ class Scheduler:
         self.block_size = config.kvcache_block_size
         self.max_prefill_chunk_size = config.max_prefill_chunk_size
         self.enable_mixed_batching = config.enable_mixed_batching
-        self.block_manager = BlockManager(config.num_kvcache_blocks, config.kvcache_block_size)
+        self.block_manager = BlockManager(
+            config.num_kvcache_blocks, config.kvcache_block_size,
+            config.prefix_cache_policy,
+        )
         self.waiting: deque[Sequence] = deque()
         self.running: deque[Sequence] = deque()
         self.metrics = {

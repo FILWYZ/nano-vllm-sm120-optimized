@@ -50,6 +50,7 @@ class LLMEngine:
             prompt = self.tokenizer.encode(prompt)
         seq = Sequence(prompt, sampling_params)
         self.scheduler.add(seq)
+        return seq.seq_id
 
     def step(self):
         seqs, is_prefill = self.scheduler.schedule()
@@ -67,15 +68,28 @@ class LLMEngine:
         prompts: list[str] | list[list[int]],
         sampling_params: SamplingParams | list[SamplingParams],
         use_tqdm: bool = True,
+        reorder_by_prefix: bool = False,
+        prefix_reorder_tokens: int = 64,
     ) -> list[str]:
         pbar = tqdm(total=len(prompts), desc="Generating", dynamic_ncols=True, disable=not use_tqdm)
         if not isinstance(sampling_params, list):
             sampling_params = [sampling_params] * len(prompts)
-        for prompt, sp in zip(prompts, sampling_params):
-            self.add_request(prompt, sp)
+        encoded_prompts = [
+            self.tokenizer.encode(prompt) if isinstance(prompt, str) else prompt
+            for prompt in prompts
+        ]
+        order = list(range(len(encoded_prompts)))
+        if reorder_by_prefix:
+            order.sort(key=lambda i: (
+                tuple(encoded_prompts[i][:prefix_reorder_tokens]), i
+            ))
+        sequence_ids = [None] * len(encoded_prompts)
+        for i in order:
+            sequence_ids[i] = self.add_request(encoded_prompts[i], sampling_params[i])
         outputs = {}
         scheduler_before = dict(self.scheduler.metrics)
         prefill_seconds = decode_seconds = 0.0
+        prefix_before = dict(self.scheduler.block_manager.metrics)
         mixed_seconds = 0.0
         prefill_tokens = decode_tokens = 0
         prefill_iterations = decode_iterations = mixed_iterations = 0
@@ -111,7 +125,7 @@ class LLMEngine:
                 outputs[seq_id] = token_ids
                 pbar.update(1)
         pbar.close()
-        outputs = [outputs[seq_id] for seq_id in sorted(outputs.keys())]
+        outputs = [outputs[seq_id] for seq_id in sequence_ids]
         outputs = [{"text": self.tokenizer.decode(token_ids), "token_ids": token_ids} for token_ids in outputs]
         total_seconds = perf_counter() - started
         output_tokens = sum(len(output["token_ids"]) for output in outputs)
@@ -142,6 +156,10 @@ class LLMEngine:
             "scheduler": {
                 key: value - scheduler_before[key]
                 for key, value in self.scheduler.metrics.items()
+            },
+            "prefix_cache": {
+                key: value - prefix_before[key]
+                for key, value in self.scheduler.block_manager.metrics.items()
             },
         }
         return outputs
