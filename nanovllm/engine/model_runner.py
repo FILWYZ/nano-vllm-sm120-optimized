@@ -8,6 +8,7 @@ from nanovllm.config import Config
 from nanovllm.engine.sequence import Sequence
 from nanovllm.models.qwen3 import Qwen3ForCausalLM
 from nanovllm.layers.sampler import Sampler
+from nanovllm.layers.attention import set_attention_backend
 from nanovllm.utils.context import set_context, get_context, reset_context
 from nanovllm.utils.loader import load_model
 
@@ -18,13 +19,16 @@ class ModelRunner:
         self.config = config
         hf_config = config.hf_config
         self.block_size = config.kvcache_block_size
-        self.enforce_eager = config.enforce_eager
         self.world_size = config.tensor_parallel_size
         self.rank = rank
         self.event = event
 
         dist.init_process_group("nccl", "tcp://localhost:2333", world_size=self.world_size, rank=rank)
         torch.cuda.set_device(rank)
+        config.attention_backend = set_attention_backend(config.attention_backend)
+        self.enforce_eager = config.enforce_eager or config.attention_backend == "sdpa"
+        if config.attention_backend == "sdpa" and not config.enforce_eager and rank == 0:
+            print("Using PyTorch SDPA attention; CUDA graph capture is disabled.")
         default_dtype = torch.get_default_dtype()
         torch.set_default_dtype(hf_config.dtype)
         torch.set_default_device("cuda")

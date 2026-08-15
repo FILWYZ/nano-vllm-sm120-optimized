@@ -22,6 +22,33 @@ A lightweight vLLM implementation built from scratch.
 pip install git+https://github.com/GeeeekExplorer/nano-vllm.git
 ```
 
+### RTX 50 series / Blackwell
+
+FlashAttention wheels may not yet match every PyTorch, CUDA, and Blackwell GPU
+combination. This fork therefore supports PyTorch SDPA as a safe fallback:
+
+```python
+from nanovllm import LLM
+
+llm = LLM(
+    "/YOUR/MODEL/PATH",
+    attention_backend="auto",  # selects SDPA on compute capability 12.x
+    tensor_parallel_size=1,
+    max_model_len=512,
+    max_num_batched_tokens=512,
+    max_num_seqs=8,
+    gpu_memory_utilization=0.75,
+)
+```
+
+Use `attention_backend="sdpa"` to force the compatibility backend, or install
+the optional `flash-attn` dependency and use `attention_backend="flash"` on a
+validated GPU/software combination. SDPA currently runs in eager mode because
+its paged-KV fallback contains dynamic sequence-length handling.
+
+See [LOCAL_BASELINE.md](LOCAL_BASELINE.md) and run `bench_local.py` to reproduce
+the RTX 5060 Laptop baseline before making further optimizations.
+
 ## Model Download
 
 To download the model weights manually, use the following command:
