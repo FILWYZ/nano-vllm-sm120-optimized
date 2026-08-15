@@ -9,6 +9,7 @@ from nanovllm.engine.sequence import Sequence
 from nanovllm.models.qwen3 import Qwen3ForCausalLM
 from nanovllm.layers.sampler import Sampler
 from nanovllm.layers.attention import set_attention_backend
+from nanovllm.layers.flashinfer_backend import prepare_flashinfer_decode_graph
 from nanovllm.utils.context import set_context, get_context, reset_context
 from nanovllm.utils.loader import load_model
 
@@ -26,10 +27,10 @@ class ModelRunner:
         dist.init_process_group("nccl", "tcp://localhost:2333", world_size=self.world_size, rank=rank)
         torch.cuda.set_device(rank)
         config.attention_backend = set_attention_backend(config.attention_backend)
-        compatibility_backend = config.attention_backend in {"sdpa", "flashinfer"}
+        compatibility_backend = config.attention_backend == "sdpa"
         self.enforce_eager = config.enforce_eager or compatibility_backend
         if compatibility_backend and not config.enforce_eager and rank == 0:
-            print(f"Using {config.attention_backend} attention; CUDA graph capture is disabled until M3.")
+            print("Using SDPA attention; CUDA graph capture requires FlashInfer.")
         default_dtype = torch.get_default_dtype()
         torch.set_default_dtype(hf_config.dtype)
         torch.set_default_device("cuda")
@@ -204,15 +205,28 @@ class ModelRunner:
         else:
             bs = input_ids.size(0)
             context = get_context()
-            graph = self.graphs[next(x for x in self.graph_bs if x >= bs)]
+            bucket = next(x for x in self.graph_bs if x >= bs)
+            graph = self.graphs[bucket]
             graph_vars = self.graph_vars
+            graph_vars["input_ids"][:bucket].zero_()
             graph_vars["input_ids"][:bs] = input_ids
+            graph_vars["positions"][:bucket].zero_()
             graph_vars["positions"][:bs] = positions
-            graph_vars["slot_mapping"].fill_(-1)
+            graph_vars["slot_mapping"][:bucket].fill_(-1)
             graph_vars["slot_mapping"][:bs] = context.slot_mapping
-            graph_vars["context_lens"].zero_()
+            graph_vars["context_lens"][:bucket].fill_(1)
             graph_vars["context_lens"][:bs] = context.context_lens
+            graph_vars["block_tables"][:bucket].zero_()
             graph_vars["block_tables"][:bs, :context.block_tables.size(1)] = context.block_tables
+            if self.config.attention_backend == "flashinfer":
+                set_context(
+                    False,
+                    slot_mapping=graph_vars["slot_mapping"][:bucket],
+                    context_lens=graph_vars["context_lens"][:bucket],
+                    block_tables=graph_vars["block_tables"][:bucket],
+                    graph_bucket=bucket,
+                )
+                prepare_flashinfer_decode_graph(get_context())
             graph.replay()
             return self.model.compute_logits(graph_vars["outputs"][:bs])
 
@@ -233,16 +247,25 @@ class ModelRunner:
         input_ids = torch.zeros(max_bs, dtype=torch.int64)
         positions = torch.zeros(max_bs, dtype=torch.int64)
         slot_mapping = torch.zeros(max_bs, dtype=torch.int32)
-        context_lens = torch.zeros(max_bs, dtype=torch.int32)
+        context_lens = torch.ones(max_bs, dtype=torch.int32)
         block_tables = torch.zeros(max_bs, max_num_blocks, dtype=torch.int32)
         outputs = torch.zeros(max_bs, hf_config.hidden_size)
-        self.graph_bs = [1, 2, 4, 8] + list(range(16, max_bs + 1, 16))
+        candidate_bs = [1, 2, 4, 8] + list(range(16, max_bs + 1, 16))
+        self.graph_bs = sorted({
+            bs for bs in candidate_bs if bs <= max_bs
+        } | {max_bs})
         self.graphs = {}
         self.graph_pool = None
 
         for bs in reversed(self.graph_bs):
             graph = torch.cuda.CUDAGraph()
-            set_context(False, slot_mapping=slot_mapping[:bs], context_lens=context_lens[:bs], block_tables=block_tables[:bs])
+            set_context(
+                False,
+                slot_mapping=slot_mapping[:bs],
+                context_lens=context_lens[:bs],
+                block_tables=block_tables[:bs],
+                graph_bucket=bs,
+            )
             outputs[:bs] = self.model(input_ids[:bs], positions[:bs])    # warmup
             with torch.cuda.graph(graph, self.graph_pool):
                 outputs[:bs] = self.model(input_ids[:bs], positions[:bs])    # capture

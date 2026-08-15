@@ -27,6 +27,7 @@ def parse_args():
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
     parser.add_argument("--warmup-repeats", type=int, default=1)
     parser.add_argument("--repeats", type=int, default=2)
+    parser.add_argument("--enforce-eager", action="store_true")
     parser.add_argument("--seed", type=int, default=2026)
     return parser.parse_args()
 
@@ -42,7 +43,7 @@ def main():
     llm = LLM(
         args.model,
         attention_backend=args.backend,
-        enforce_eager=True,
+        enforce_eager=args.enforce_eager,
         tensor_parallel_size=1,
         max_model_len=args.max_model_len,
         max_num_batched_tokens=max(2048, args.max_model_len * max_requests),
@@ -103,6 +104,7 @@ def main():
             "warmup_repeats": args.warmup_repeats,
             "repeats": args.repeats,
         },
+            "enforce_eager": args.enforce_eager,
         "workloads": results,
     }
     write_json(args.output, payload)

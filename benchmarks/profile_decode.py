@@ -15,6 +15,7 @@ def parse_args():
     parser.add_argument("--requests", type=int, default=8)
     parser.add_argument("--input-len", type=int, default=128)
     parser.add_argument("--output-len", type=int, default=16)
+    parser.add_argument("--enforce-eager", action="store_true")
     return parser.parse_args()
 
 
@@ -23,7 +24,7 @@ def main():
     llm = LLM(
         args.model,
         attention_backend="auto",
-        enforce_eager=True,
+        enforce_eager=args.enforce_eager,
         max_model_len=512,
         max_num_batched_tokens=2048,
         max_num_seqs=args.requests,

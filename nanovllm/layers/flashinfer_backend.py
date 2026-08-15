@@ -38,6 +38,8 @@ class FlashInferRuntime:
         self.planned_signature = None
         self.output_buffers = {}
         self.page_columns = {}
+        self.decode_graphs = {}
+        self.active_decode = None
 
     def _workspace(self, device):
         if self.workspace is None or self.workspace.device != device:
@@ -64,6 +66,71 @@ class FlashInferRuntime:
         ))
         last_page_len = (seq_lens - 1).remainder(page_size) + 1
         return indptr, indices, last_page_len
+
+    def _graph_decode_wrapper(self, context, workspace, num_heads,
+                              num_kv_heads, head_dim, page_size, scale,
+                              q_dtype, kv_dtype):
+        bucket = context.graph_bucket
+        entry = self.decode_graphs.get(bucket)
+        if entry is None:
+            device = context.block_tables.device
+            indptr_buffer = torch.empty(
+                bucket + 1, dtype=torch.int32, device=device
+            )
+            indices_buffer = torch.empty(
+                context.block_tables.numel(), dtype=torch.int32, device=device
+            )
+            last_page_len_buffer = torch.empty(
+                bucket, dtype=torch.int32, device=device
+            )
+            wrapper = flashinfer.BatchDecodeWithPagedKVCacheWrapper(
+                workspace,
+                "NHD",
+                use_cuda_graph=True,
+                paged_kv_indptr_buffer=indptr_buffer,
+                paged_kv_indices_buffer=indices_buffer,
+                paged_kv_last_page_len_buffer=last_page_len_buffer,
+                backend="auto",
+            )
+            spec = (
+                num_heads, num_kv_heads, head_dim, page_size, scale,
+                q_dtype, kv_dtype,
+            )
+            entry = {"wrapper": wrapper, "spec": spec}
+            self.decode_graphs[bucket] = entry
+        elif entry["spec"] != (
+            num_heads, num_kv_heads, head_dim, page_size, scale,
+            q_dtype, kv_dtype,
+        ):
+            raise RuntimeError("FlashInfer graph bucket reused with a new signature")
+        self._plan_graph_decode(context, entry)
+        return entry["wrapper"]
+
+    def _plan_graph_decode(self, context, entry):
+        (num_heads, num_kv_heads, head_dim, page_size, scale,
+         q_dtype, kv_dtype) = entry["spec"]
+        indptr, indices, last_page_len = self._page_metadata(
+            context.block_tables, context.context_lens, page_size
+        )
+        entry["wrapper"].plan(
+            indptr,
+            indices,
+            last_page_len,
+            num_heads,
+            num_kv_heads,
+            head_dim,
+            page_size,
+            sm_scale=scale,
+            q_data_type=q_dtype,
+            kv_data_type=kv_dtype,
+        )
+        self.active_decode = entry["wrapper"]
+
+    def prepare_graph_decode(self, context):
+        entry = self.decode_graphs.get(context.graph_bucket)
+        if entry is None:
+            raise RuntimeError("CUDA graph bucket was not captured")
+        self._plan_graph_decode(context, entry)
 
     def _plan(self, context, q, k, k_cache, num_heads, num_kv_heads, head_dim, scale):
         mode = "ragged_prefill" if context.is_prefill and context.block_tables is None else (
@@ -119,22 +186,29 @@ class FlashInferRuntime:
                     kv_data_type=k_cache.dtype,
                 )
             else:
-                if self.decode is None:
-                    self.decode = flashinfer.BatchDecodeWithPagedKVCacheWrapper(
-                        workspace, "NHD", backend="auto"
+                if context.graph_bucket:
+                    self.active_decode = self._graph_decode_wrapper(
+                        context, workspace, num_heads, num_kv_heads, head_dim,
+                        page_size, scale, q.dtype, k_cache.dtype,
                     )
-                self.decode.plan(
-                    indptr,
-                    indices,
-                    last_page_len,
-                    num_heads,
-                    num_kv_heads,
-                    head_dim,
-                    page_size,
-                    sm_scale=scale,
-                    q_data_type=q.dtype,
-                    kv_data_type=k_cache.dtype,
-                )
+                else:
+                    if self.decode is None:
+                        self.decode = flashinfer.BatchDecodeWithPagedKVCacheWrapper(
+                            workspace, "NHD", backend="auto"
+                        )
+                    self.decode.plan(
+                        indptr,
+                        indices,
+                        last_page_len,
+                        num_heads,
+                        num_kv_heads,
+                        head_dim,
+                        page_size,
+                        sm_scale=scale,
+                        q_data_type=q.dtype,
+                        kv_data_type=k_cache.dtype,
+                    )
+                    self.active_decode = self.decode
         self.planned_context = context
         self.planned_mode = mode
         self.planned_signature = signature
@@ -158,13 +232,14 @@ class FlashInferRuntime:
             return self.ragged_prefill.run(q, k, v, out=self._output_buffer(q))
         if mode == "paged_prefill":
             return self.paged_prefill.run(q, (k_cache, v_cache), out=self._output_buffer(q))
-        return self.decode.run(q, (k_cache, v_cache), out=self._output_buffer(q))
+        return self.active_decode.run(q, (k_cache, v_cache), out=self._output_buffer(q))
 
     def reset(self):
         self.planned_context = None
         self.planned_mode = None
         self.planned_signature = None
         self.output_buffers.clear()
+        self.active_decode = None
         self.page_columns.clear()
 
 _RUNTIME = FlashInferRuntime()
@@ -176,3 +251,7 @@ def flashinfer_forward(*args, **kwargs):
 
 def reset_flashinfer_runtime():
     _RUNTIME.reset()
+
+
+def prepare_flashinfer_decode_graph(context):
+    _RUNTIME.prepare_graph_decode(context)
