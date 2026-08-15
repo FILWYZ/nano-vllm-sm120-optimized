@@ -45,6 +45,27 @@ class TestVariableBlockSize(unittest.TestCase):
         self.assertEqual(len(seq.block_table), 2)
         self.assertEqual(len(manager.free_block_ids), free_before - 1)
 
+    def test_decode_reservation_prevents_boundary_allocation(self):
+        Sequence.block_size = 16
+        manager = BlockManager(4, 16, reserve_decode_kv=True)
+        seq = Sequence(list(range(16)))
+        seq.max_tokens = 32
+        self.assertEqual(manager.can_allocate(seq), 0)
+        manager.allocate(seq, 0)
+        self.assertEqual(len(seq.block_table), 3)
+        self.assertEqual(len(manager.free_block_ids), 1)
+
+        for token in range(16, 33):
+            seq.append_token(token)
+            self.assertTrue(manager.can_append(seq))
+            manager.may_append(seq)
+        self.assertEqual(len(seq.block_table), 3)
+        self.assertEqual(len(manager.free_block_ids), 1)
+
+        too_large = Sequence(list(range(16)))
+        too_large.max_tokens = 64
+        self.assertEqual(manager.can_allocate(too_large), -1)
+
 
 if __name__ == "__main__":
     unittest.main()

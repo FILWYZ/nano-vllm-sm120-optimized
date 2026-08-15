@@ -57,6 +57,10 @@ class Sequence:
         return (self.num_tokens + self.block_size - 1) // self.block_size
 
     @property
+    def max_num_blocks(self):
+        return (self.num_prompt_tokens + self.max_tokens + self.block_size - 1) // self.block_size
+
+    @property
     def last_block_num_tokens(self):
         return self.num_tokens - (self.num_blocks - 1) * self.block_size
 

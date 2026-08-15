@@ -30,6 +30,8 @@ def parse_args():
     parser.add_argument("--max-model-len", type=int)
     parser.add_argument("--gpu-memory-utilization", type=float)
     parser.add_argument("--block-size", type=int)
+    parser.add_argument("--disable-mixed-batching", action="store_true")
+    parser.add_argument("--reserve-output-kv", action="store_true")
     return parser.parse_args()
 
 
@@ -101,6 +103,10 @@ def main():
         kwargs["gpu_memory_utilization"] = args.gpu_memory_utilization
     if args.block_size is not None:
         kwargs["kvcache_block_size"] = args.block_size
+    if args.disable_mixed_batching:
+        kwargs["enable_mixed_batching"] = False
+    if args.reserve_output_kv:
+        kwargs["reserve_decode_kv"] = True
 
     init_started = time.perf_counter()
     llm = LLM(args.model, **kwargs)
@@ -173,6 +179,7 @@ def main():
                 "output_sha256": token_digest(outputs),
             },
         }
+        payload["engine_metrics"] = getattr(llm, "last_metrics", {})
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(payload, indent=2) + "\n")

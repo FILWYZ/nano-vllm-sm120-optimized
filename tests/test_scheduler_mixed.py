@@ -15,6 +15,7 @@ def config(enable_mixed_batching=True, chunk_size=32):
         max_prefill_chunk_size=chunk_size,
         prefix_cache_policy="lru",
         enable_mixed_batching=enable_mixed_batching,
+        reserve_decode_kv=False,
     )
 
 
@@ -90,21 +91,28 @@ class TestMixedScheduler(unittest.TestCase):
 
     def test_decode_candidate_cannot_preempt_already_scheduled_sequence(self):
         constrained = config()
-        constrained.num_kvcache_blocks = 4
+        constrained.num_kvcache_blocks = 3
         scheduler = Scheduler(constrained)
         first = self.add_running(scheduler, length=20)
-        second = self.add_running(scheduler, length=17)
+        second = Sequence(list(range(16)))
+        scheduler.block_manager.allocate(second, 0)
+        second.num_cached_tokens = 16
+        second.status = SequenceStatus.RUNNING
+        second.is_prefill = False
+        second.append_token(16)
+        scheduler.running.append(second)
         self.assertEqual(len(scheduler.block_manager.free_block_ids), 0)
 
         scheduled, uses_prefill_path = scheduler.schedule()
 
-        self.assertTrue(uses_prefill_path)
-        self.assertEqual(scheduled, [first, second])
+        self.assertFalse(uses_prefill_path)
+        self.assertEqual(scheduled, [first])
         self.assertIn(first, scheduler.running)
         self.assertTrue(first.block_table)
-        self.assertIn(second, scheduler.running)
-        self.assertTrue(second.block_table)
-        self.assertEqual(second.status, SequenceStatus.RUNNING)
+        self.assertNotIn(second, scheduled)
+        self.assertIn(second, scheduler.waiting)
+        self.assertFalse(second.block_table)
+        self.assertEqual(second.status, SequenceStatus.WAITING)
         self.assertEqual(scheduler.metrics["preemptions"], 1)
         self.assertTrue(all(seq.block_table for seq in scheduled))
 

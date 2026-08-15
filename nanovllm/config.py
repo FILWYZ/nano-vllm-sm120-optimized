@@ -20,6 +20,7 @@ class Config:
     max_prefill_chunk_size: int = 512
     enable_mixed_batching: bool = True
     prefix_cache_policy: str = "lru"
+    reserve_decode_kv: bool = False
 
     def __post_init__(self):
         assert os.path.isdir(self.model)

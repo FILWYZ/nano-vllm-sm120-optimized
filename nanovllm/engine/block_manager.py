@@ -25,9 +25,11 @@ class Block:
 
 class BlockManager:
 
-    def __init__(self, num_blocks: int, block_size: int, policy: str = "lru"):
+    def __init__(self, num_blocks: int, block_size: int, policy: str = "lru",
+                 reserve_decode_kv: bool = False):
         self.block_size = block_size
         self.policy = policy
+        self.reserve_decode_kv = reserve_decode_kv
         self.blocks: list[Block] = [Block(i) for i in range(num_blocks)]
         self.hash_to_block_id: dict[int, int] = dict()
         self.free_block_ids: deque[int] = deque(range(num_blocks))
@@ -66,11 +68,14 @@ class BlockManager:
         self.used_block_ids.remove(block_id)
         self.free_block_ids.append(block_id)
 
+    def _allocation_target(self, seq: Sequence) -> int:
+        return seq.max_num_blocks if self.reserve_decode_kv else seq.num_blocks
+
     def can_allocate(self, seq: Sequence) -> int:
         h = -1
         self.metrics["queries"] += 1
         num_cached_blocks = 0
-        num_new_blocks = seq.num_blocks
+        num_new_blocks = self._allocation_target(seq)
         for i in range(seq.num_blocks - 1):
             token_ids = seq.block(i)
             h = self.compute_hash(token_ids, h)
@@ -109,7 +114,7 @@ class BlockManager:
                 self.free_block_ids.remove(block_id)
                 self.used_block_ids.add(block_id)
             seq.block_table.append(block_id)
-        for i in range(num_cached_blocks, seq.num_blocks):
+        for i in range(num_cached_blocks, self._allocation_target(seq)):
             seq.block_table.append(self._allocate_block())
         seq.num_cached_tokens = num_cached_blocks * self.block_size
 
@@ -123,10 +128,11 @@ class BlockManager:
         seq.block_table.clear()
 
     def can_append(self, seq: Sequence) -> bool:
-        return len(self.free_block_ids) >= (len(seq) % self.block_size == 1)
+        needs_block = seq.num_blocks > len(seq.block_table)
+        return not needs_block or bool(self.free_block_ids)
 
     def may_append(self, seq: Sequence):
-        if len(seq) % self.block_size == 1:
+        if seq.num_blocks > len(seq.block_table):
             seq.block_table.append(self._allocate_block())
 
     def hash_blocks(self, seq: Sequence):

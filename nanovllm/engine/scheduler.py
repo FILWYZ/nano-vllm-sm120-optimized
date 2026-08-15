@@ -16,7 +16,7 @@ class Scheduler:
         self.enable_mixed_batching = config.enable_mixed_batching
         self.block_manager = BlockManager(
             config.num_kvcache_blocks, config.kvcache_block_size,
-            config.prefix_cache_policy,
+            config.prefix_cache_policy, config.reserve_decode_kv,
         )
         self.waiting: deque[Sequence] = deque()
         self.running: deque[Sequence] = deque()
