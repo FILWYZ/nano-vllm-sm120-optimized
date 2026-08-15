@@ -1,35 +1,32 @@
-# nano-vLLM Local SM120 Optimization Results
+# nano-vLLM 本地 SM120 优化结果
 
-## Scope
+> 面试级逐阶段讲解、实现证据链与优缺点分析见 [`ROADMAP_INTERVIEW_GUIDE_CN.md`](ROADMAP_INTERVIEW_GUIDE_CN.md)。
 
-This branch remains an offline, teaching-oriented inference engine. It targets
-the local NVIDIA GeForce RTX 5060 Laptop GPU (compute capability 12.0), WSL2,
-PyTorch 2.11.0+cu128, Triton 3.6, FlashInfer 0.6.6, and Qwen3-0.6B FP16.
-Results should not be generalized to other models, GPUs, context lengths, or
-online traffic without rerunning the versioned benchmark suite.
+## 适用范围
 
-## Reproducible version index
+该分支仍然定位为离线、教学型推理引擎。目标运行环境为本地 NVIDIA GeForce RTX 5060 Laptop GPU（计算能力 12.0）、WSL2、PyTorch 2.11.0+cu128、Triton 3.6、FlashInfer 0.6.6，以及 Qwen3-0.6B FP16。在没有重新运行对应版本的基准测试套件之前，不应将这些结果直接推广到其他模型、GPU、上下文长度或在线流量场景。
 
-| Stage | Git commit | Tag | Primary result |
+## 可复现版本索引
+
+| 阶段 | Git 提交 | 标签 | 主要结果 |
 |---|---|---|---|
-| V0 | `7aa1f25` | `baseline-blackwell-v0` | SM120 SDPA baseline runs |
-| M0 | `acafa11` | `m0-measurement` | fixed metrics/profiler baseline |
-| M1 | `88b92d1` | `m1-flashinfer` | batch-paged FlashInfer attention |
-| M2 | `7d52dd8` | `m2-sync-free` | synchronization-free KV append |
-| M3 | `a95c408` | `m3-cudagraph` | bucketed decode CUDA Graphs |
-| M4 | `677d73c` | `m4-kv-pages` | selected 16-token KV pages |
-| M5 | `6e5441e` | `m5-continuous-batching` | mixed continuous batching |
-| M6 | `3bcfe31` | `m6-prefix-cache` | observable LRU + offline reorder |
-| M7 | recorded by tag `m7-final` | `m7-final` | greedy/buffered sampling |
+| V0 | `7aa1f25` | `baseline-blackwell-v0` | SM120 SDPA 基线成功运行 |
+| M0 | `acafa11` | `m0-measurement` | 固定指标与性能分析器基线 |
+| M1 | `88b92d1` | `m1-flashinfer` | 批量分页式 FlashInfer Attention |
+| M2 | `7d52dd8` | `m2-sync-free` | 无同步 KV 追加 |
+| M3 | `a95c408` | `m3-cudagraph` | 分桶式 Decode CUDA Graph |
+| M4 | `677d73c` | `m4-kv-pages` | 选定 16-token KV 页 |
+| M5 | `6e5441e` | `m5-continuous-batching` | 混合连续批处理 |
+| M6 | `3bcfe31` | `m6-prefix-cache` | 可观测的 LRU + 离线重排序 |
+| M7 | 由标签 `m7-final` 记录 | `m7-final` | 贪心/缓冲式采样 |
 
-Every stage is a rollback point. Machine-readable JSON and compact profiler
-summaries live under `benchmarks/results`; large Chrome traces are ignored.
+每个阶段都可作为回滚点。机器可读的 JSON 和精简版性能分析摘要位于 `benchmarks/results`；体积较大的 Chrome Trace 文件未纳入版本控制。
 
-## Headline fixed-matrix result
+## 固定测试矩阵的核心结果
 
-M0 SDPA versus final M7 stochastic sampling (`temperature=0.6`):
+M0 SDPA 与最终 M7 随机采样（`temperature=0.6`）的对比：
 
-| Requests | Input | M0 tok/s | M7 tok/s | Overall speedup |
+| 请求数 | 输入长度 | M0 tok/s | M7 tok/s | 总体加速比 |
 |---:|---:|---:|---:|---:|
 | 1 | 64 | 27.9 | 198.3 | 7.1x |
 | 4 | 64 | 88.2 | 745.4 | 8.5x |
@@ -38,89 +35,70 @@ M0 SDPA versus final M7 stochastic sampling (`temperature=0.6`):
 | 4 | 256 | 86.5 | 683.9 | 7.9x |
 | 8 | 256 | 137.2 | 1,107.4 | 8.1x |
 
-This is not one optimization's effect. It is the cumulative change from a
-correctness-first eager SDPA path to paged attention, synchronization removal,
-graph replay, smaller KV pages, and scheduler/cache/sampling work.
+这并非某一项优化单独产生的效果，而是从“正确性优先”的 Eager SDPA 路径逐步演进到分页式 Attention、消除同步、CUDA Graph 重放、更小的 KV 页，以及调度器、缓存和采样优化后的累积成果。
 
-Final greedy mode reaches 1,543.3 tok/s at 8 requests/input 64, but it is listed
-separately because greedy and stochastic sampling have different semantics.
+最终贪心模式在 8 个请求、输入长度 64 的场景下达到 1,543.3 tok/s。但由于贪心采样与随机采样的语义不同，因此该结果单独列出。
 
-## What each milestone proved
+## 每个里程碑验证了什么
 
-### M0: measure before changing
+### M0：先测量，再改动
 
-Separated prefill/decode throughput, TTFT, TPOT, peak memory, attention latency,
-and profiler evidence. It identified 6,736 paged-KV gathers and 3.28 GiB of
-cumulative temporary allocation.
+分别测量 Prefill/Decode 吞吐量、TTFT、TPOT、峰值显存、Attention 延迟，并保留性能分析证据。由此识别出 6,736 次分页 KV Gather，以及累计 3.28 GiB 的临时内存分配。
 
-### M1: use a native paged-attention backend
+### M1：使用原生分页式 Attention 后端
 
-FlashInfer removed per-request contiguous KV reconstruction. Batch-8 throughput
-rose 64-65%, while attention decode p50 fell 53-57%.
+FlashInfer 消除了每个请求都要执行的连续 KV 重建。Batch-8 吞吐量提升 64–65%，同时 Attention Decode 的 p50 延迟下降 53–57%。
 
-### M2: remove synchronization around KV writes
+### M2：消除 KV 写入周围的同步
 
-The Triton append kernel reduced `nonzero` calls from 1,807 to 15 and scalar
-extractions from 449 to 1. Profiler self CPU fell 49.7%.
+Triton 追加 Kernel 将 `nonzero` 调用次数从 1,807 次降至 15 次，将标量提取次数从 449 次降至 1 次。性能分析器记录的 CPU Self Time 下降 49.7%。
 
-### M3: replay stable decode work
+### M3：重放稳定的 Decode 工作负载
 
-Bucketed CUDA Graphs cut visible TorchDynamo lookups and matrix-multiply calls
-by over 92%. Batch-8/input-64 throughput reached 1,518.5 tok/s, with 48/48 exact
-tokens across padded buckets and a page boundary.
+分桶式 CUDA Graph 将可见的 TorchDynamo 查找和矩阵乘法调用减少了 92% 以上。Batch-8、输入长度 64 时，吞吐量达到 1,518.5 tok/s；跨填充分桶和页边界的 48/48 个 Token 均精确一致。
 
-### M4: trade less than 5% speed for usable KV capacity
+### M4：以低于 5% 的速度代价换取更高的可用 KV 容量
 
-A five-size isolated sweep selected 16-token pages. They reduce expected tail
-waste 94.1% and make prefix reuse 16x finer while staying within the declared
-throughput budget.
+通过对五种页大小进行隔离扫描，最终选定 16-token 页。该方案将预期尾部浪费降低 94.1%，使前缀复用粒度细化 16 倍，同时仍满足预先声明的吞吐量预算。
 
-### M5: protect decode when prompts arrive
+### M5：在新 Prompt 到达时保护 Decode
 
-Mixed decode+prefill batches reduced the deliberate online maximum inter-token
-gap from 82.33 ms to 18.95 ms (-77%) without offline throughput regression.
+混合 Decode+Prefill 批处理将特设在线实验中的最大 Token 间隔从 82.33 ms 降至 18.95 ms（下降 77%），且离线吞吐量没有回退。
 
-### M6: make cache behavior explicit
+### M6：让缓存行为显式且可观测
 
-LRU/FIFO metrics expose hits, collisions, and evictions. Stable offline prefix
-clustering reduced prefill tokens 42.9%, raised hit rate 60.0% to 92.3%, and
-preserved the original output order exactly.
+LRU/FIFO 指标可展示命中、冲突与逐出情况。稳定的离线前缀聚类将 Prefill Token 数减少 42.9%，把命中率从 60.0% 提高到 92.3%，同时严格保持原始输出顺序不变。
 
-### M7: avoid random-sampling work when deterministic output is requested
+### M7：请求确定性输出时，避免执行随机采样工作
 
-Greedy sampler p50 is 65-74% lower than stochastic sampling at Qwen3 vocabulary
-size and improves selected end-to-end workloads by up to 7.2%.
+在 Qwen3 词表规模下，贪心采样器的 p50 延迟比随机采样低 65–74%，并使选定端到端工作负载的性能最高提升 7.2%。
 
-## Correctness gates
+## 正确性门禁
 
-The final suite contains 21 passing CPU/GPU tests covering:
+最终测试套件包含 21 项全部通过的 CPU/GPU 测试，覆盖：
 
-- SDPA packed/prefix/decode reference paths;
-- FlashInfer ragged, paged, mixed, and GQA attention;
-- Triton KV writes and padded slots;
-- graph/eager output parity and page boundaries;
-- variable page allocation and prefix hash reuse;
-- mixed scheduler fairness and ablation behavior;
-- LRU/FIFO/collision semantics;
-- greedy, stochastic-buffer, and mixed sampling behavior.
+- SDPA Packed/Prefix/Decode 参考路径；
+- FlashInfer Ragged、Paged、Mixed 和 GQA Attention；
+- Triton KV 写入与填充槽位；
+- Graph/Eager 输出一致性与页边界；
+- 可变页分配与前缀哈希复用；
+- 混合调度器的公平性与消融行为；
+- LRU/FIFO/冲突语义；
+- 贪心、随机缓冲和混合采样行为。
 
-`uv pip check` reports all 63 installed packages compatible.
+`uv pip check` 显示已安装的 63 个软件包全部兼容。
 
-## How to interpret the metrics
+## 如何解读这些指标
 
-- Output tok/s is the user-visible offline throughput, but cannot diagnose a
-  bottleneck alone.
-- Decode tok/s and TPOT identify memory/launch sensitivity.
-- TTFT and prefill tokens expose prompt and cache effects.
-- Maximum inter-token gap is the fairness signal for staggered arrivals.
-- Cache token hits prove skipped model work; hit rate alone can hide request
-  size differences.
-- Peak allocated/reserved memory bounds capacity, while expected tail waste
-  estimates how much of that capacity is usable.
-- Operator counts and CPU self time establish the causal mechanism behind a
-  speedup.
+- 输出 tok/s 是用户可感知的离线吞吐量，但不能单独用于诊断瓶颈。
+- Decode tok/s 和 TPOT 用于识别对显存访问或 Kernel 启动开销的敏感性。
+- TTFT 和 Prefill Token 数用于揭示 Prompt 与缓存带来的影响。
+- 最大 Token 间隔是交错到达场景下衡量调度公平性的信号。
+- 缓存 Token 命中数能够证明模型计算确实被跳过；仅看命中率可能会掩盖请求大小的差异。
+- 峰值已分配/已预留显存限定了容量上限，而预期尾部浪费用于估算其中有多少容量真正可用。
+- 算子调用次数和 CPU Self Time 用于确认加速背后的因果机制。
 
-## Standard reproduction
+## 标准复现实验
 
 ```bash
 cd /home/asus/projects/nano-vllm-baseline
@@ -134,18 +112,14 @@ python -m benchmarks.end_to_end \
   --output benchmarks/results/reproduction.json
 ```
 
-For a specific claim, use the reproduction command in that milestone's
-document. Do not compare cold-start runs with shape-warmed JSON.
+如需复现某一项具体结论，请使用对应里程碑文档中给出的复现命令。不要将冷启动运行结果与已完成 Shape Warmup 的 JSON 结果直接比较。
 
-## Honest remaining limits
+## 尚存局限（如实说明）
 
-- Results cover one small Qwen model and one 8 GiB laptop GPU.
-- CUPTI CUDA activities are unavailable in the current WSL driver path; CUDA
-  events and synchronized end-to-end timings are authoritative.
-- FlashInfer planning retains small host/device metadata copies.
-- Prompt KV is not lazily allocated per chunk.
-- No FP8 KV, speculative decoding, tensor parallel, top-k/top-p, or multi-model
-  evaluation is claimed.
+- 结果仅覆盖一个小型 Qwen 模型和一块 8 GiB 笔记本 GPU。
+- 当前 WSL 驱动路径无法使用 CUPTI CUDA Activity；应以 CUDA Event 和同步后的端到端计时为准。
+- FlashInfer 的规划阶段仍保留少量主机/设备元数据复制。
+- Prompt KV 尚未按 Chunk 进行惰性分配。
+- 本项目尚未宣称支持或完成 FP8 KV、投机解码、张量并行、top-k/top-p 或多模型评估。
 
-These are the measured next directions, not hidden completion criteria for the
-M0-M7 baseline.
+以上内容是经测量后确定的下一步方向，而不是 M0–M7 基线中未公开的完成标准。
