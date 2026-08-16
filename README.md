@@ -106,7 +106,7 @@ python benchmarks/upstream_ab.py \
 python benchmarks/summarize_m8.py
 ```
 
-完整实验计划和对比版本位于 [`docs/optimizations/M8_COMPARISON_PLAN.md`](docs/optimizations/M8_COMPARISON_PLAN.md) 和 [`docs/optimizations/M8_UPSTREAM_COMPARISON.md`](docs/optimizations/M8_UPSTREAM_COMPARISON.md)。大体积 Chrome Trace 未纳入版本控制，原始精简 JSON 和摘要保留在 `benchmarks/results/`。
+完整实验计划和对比版本见 docs/optimizations/M8_COMPARISON_PLAN.md 与 docs/optimizations/M8_UPSTREAM_COMPARISON.md；阶段原始结果和大体积 Trace 不纳入公开仓库，仅保留最终摘要。
 
 ## 正确性与工程门禁
 

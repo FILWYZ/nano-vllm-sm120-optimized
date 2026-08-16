@@ -22,7 +22,7 @@
 | M7 | 由标签 `m7-final` 记录 | `m7-final` | 贪心/缓冲式采样 |
 | M8 | 由标签 `m8-upstream-proof` 记录 | `m8-upstream-proof` | 输出感知 KV Admission + 上游直接 A/B |
 
-每个阶段都可作为回滚点。机器可读的 JSON 和精简版性能分析摘要位于 `benchmarks/results`；体积较大的 Chrome Trace 文件未纳入版本控制。
+每个阶段都可作为回滚点；最终机器可读摘要位于 benchmarks/results/m8_upstream_comparison_summary.json，阶段原始结果和大体积 Trace 不纳入公开仓库。
 
 ## M8 相对 GitHub 上游的直接证明
 

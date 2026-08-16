@@ -195,4 +195,7 @@ cython_debug/
 
 # Local profiler traces are large; compact summaries and JSON metrics are versioned.
 benchmarks/results/*_trace.json
+# Intermediate benchmark outputs are local artifacts; retain only the final summary.
+benchmarks/results/*
+!benchmarks/results/m8_upstream_comparison_summary.json
 .cursorindexingignore

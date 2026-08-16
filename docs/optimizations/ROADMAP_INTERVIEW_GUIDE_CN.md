@@ -477,7 +477,7 @@ Sampler 只占总耗时的一小部分。按 Amdahl 定律，即使局部无限�
 - SDPA 参考路径仍保留，便于学习和对拍。
 - 后端适配集中在独立文件，模型与调度器没有被 FlashInfer API 污染。
 - 每阶段都有 Git Tag，可回滚并复现实验。
-- 21 项 CPU/GPU 测试覆盖 Attention、KV、Graph、Scheduler、Cache 与 Sampling。
+- 23 项 CPU/GPU 测试覆盖 Attention、KV、Graph、Scheduler、Cache 与 Sampling。
 - 结果 JSON 带环境与 Commit 信息，减少“在我机器上更快”的不可复现问题。
 - 对负结果和边界如“LRU 未胜 FIFO”“M4 不是吞吐优化”进行了诚实记录，这在面试中非常加分。
 

@@ -92,9 +92,6 @@ The warmed CPU profile of 8 requests x 16 output tokens reports:
 - 448 scalar extractions consuming 33.8 ms self CPU time;
 - 7,757 copies consuming 92.1 ms self CPU time.
 
-The original 55.56 tok/s smoke number used variable prompt lengths and lacked
-shape warmup. The fixed M0 matrix supersedes it for all future comparisons.
-
 ## Evidence for M1
 
 The current SDPA decode implementation loops over sequences, copies paged KV

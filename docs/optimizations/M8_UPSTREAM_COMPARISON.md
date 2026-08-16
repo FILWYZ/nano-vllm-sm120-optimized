@@ -79,7 +79,7 @@ M8 的峰值已分配显存增加约 **10.1%**。这是 CUDA Graph、FlashInfer 
 1. 初始运行在高 KV 压力 Mixed Batch 中触发 `slot_mapping` 与 K/V Token 数不一致；
 2. 诊断发现 `_schedule_decode` 会在同一调度轮次抢占已经加入 `scheduled_seqs` 的早期序列；
 3. Commit `0a181f0` 将已选 Decode 序列暂存到独立列表，完成候选决策后再放回 `running`；
-4. 新增真实页边界回归测试，测试总数从 21 增至 22；
+4. 新增真实页边界回归测试，当前测试总数为 23；
 5. 修复后默认 M7 成功完成，但耗时 723.72 秒、185.11 tok/s，比 Compat 回退 24.7%。
 
 这次负结果暴露了第二个瓶颈：16-token Page、256 个长输出请求和完整 Prompt KV 预分配组合会触发反复抢占与重复 Prefill。

@@ -45,7 +45,7 @@
 
 ### 正确性与稳定性
 
-- M7 最终 21 项 CPU/GPU 测试必须全部通过。
+- 最终 23 项 CPU/GPU 测试必须全部通过。
 - Compat 的 SDPA Packed/Prefix/Decode 三项参考测试必须通过。
 - 每次 Benchmark 的实际输出 Token 数必须等于请求的 `max_tokens` 总和。
 - JSON 必须记录 Git Commit、设备、软件环境和输出摘要。
