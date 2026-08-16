@@ -76,7 +76,7 @@ flowchart LR
 ## 复现环境
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/FILWYZ/nano-vllm-sm120-optimized.git
 cd nano-vllm-baseline
 
 uv venv --python 3.12
