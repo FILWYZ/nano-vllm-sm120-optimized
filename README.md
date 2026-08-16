@@ -15,6 +15,23 @@
 
 `Python` · `PyTorch` · `CUDA` · `Triton` · `FlashInfer` · `WSL2` · `uv` · `unittest`
 
+## 项目结构
+
+```text
+examples/                  快速上手
+nanovllm/                  推理运行时与模型实现
+  engine/                  请求生命周期、调度、KV Cache、模型执行
+  layers/                  Attention、FlashInfer、采样和基础算子
+  models/                  Qwen3 模型
+benchmarks/                性能测量与对比
+  micro/                   算子级/Kernel 级测量
+  e2e/                     端到端、在线批处理和上游 A/B
+  analysis/                结果汇总、图验证和形状扫描
+scripts/benchmarks/        可重复运行脚本
+tests/                     优化正确性门禁
+docs/optimizations/        M0–M8 技术路线
+```
+
 ## 系统流程
 
 ```mermaid
@@ -94,7 +111,7 @@ python -m unittest discover -s tests -v
 运行统一上游 A/B 入口（根据本地模型路径调整）：
 
 ```bash
-python benchmarks/upstream_ab.py \
+python -m benchmarks.e2e.upstream_ab \
   --model /path/to/Qwen3-0.6B \
   --variant optimized_m8_offline \
   --suite github \
@@ -103,7 +120,7 @@ python benchmarks/upstream_ab.py \
   --disable-mixed-batching \
   --output benchmarks/results/m8_ab/optimized_m8_offline_github.json
 
-python benchmarks/summarize_m8.py
+python -m benchmarks.analysis.summarize_m8
 ```
 
 完整实验计划和对比版本见 docs/optimizations/M8_COMPARISON_PLAN.md 与 docs/optimizations/M8_UPSTREAM_COMPARISON.md；阶段原始结果和大体积 Trace 不纳入公开仓库，仅保留最终摘要。

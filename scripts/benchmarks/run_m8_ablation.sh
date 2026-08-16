@@ -3,7 +3,7 @@ set -euo pipefail
 
 root=/home/asus/projects/nano-vllm-baseline
 python_bin="$root/.venv/bin/python"
-runner="$root/benchmarks/upstream_ab.py"
+runner="$root/benchmarks/e2e/upstream_ab.py"
 model="/mnt/c/Users/ASUS/Documents/ChatGPT/算子/models/Qwen3-0.6B"
 
 for block_size in 16 64 256; do

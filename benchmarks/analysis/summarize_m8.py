@@ -5,7 +5,7 @@ import statistics
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent / "results"
+ROOT = Path(__file__).resolve().parents[1] / "results"
 AB = ROOT / "m8_ab"
 SHAPES = [(1, 64), (4, 64), (8, 64), (1, 256), (4, 256), (8, 256)]
 

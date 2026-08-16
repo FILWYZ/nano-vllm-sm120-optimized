@@ -34,7 +34,7 @@ unchanged.
 ## Correctness evidence
 
 The existing seven SDPA/FlashInfer/KV tests pass. In addition,
-`benchmarks/validate_graph.py` compares two full model runs:
+`benchmarks/analysis/validate_graph.py` compares two full model runs:
 
 - 3 real requests executed in a padded graph bucket;
 - 255 prompt tokens plus 16 output tokens, forcing allocation and access across

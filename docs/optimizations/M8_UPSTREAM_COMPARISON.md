@@ -135,7 +135,7 @@ Commit `2133478` 新增可选 `reserve_decode_kv`：
 cd /home/asus/projects/nano-vllm-baseline
 source .venv/bin/activate
 
-python benchmarks/upstream_ab.py \
+python -m benchmarks.e2e.upstream_ab \
   --model /path/to/Qwen3-0.6B \
   --variant optimized_m8_offline \
   --suite github \
@@ -144,7 +144,7 @@ python benchmarks/upstream_ab.py \
   --disable-mixed-batching \
   --output benchmarks/results/m8_ab/optimized_m8_offline_github.json
 
-python benchmarks/summarize_m8.py
+python -m benchmarks.analysis.summarize_m8
 ```
 
 对照版本需从 `/home/asus/projects/nano-vllm-upstream-compat` 作为 `cwd/PYTHONPATH` 运行同一个适配器。完整命令和验收规则见 `M8_COMPARISON_PLAN.md`。

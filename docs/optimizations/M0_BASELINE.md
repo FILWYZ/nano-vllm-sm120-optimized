@@ -13,11 +13,11 @@ M0 deliberately changes observability, not inference algorithms.
 
 - `LLMEngine.last_metrics` records prefill/decode tokens, iterations, elapsed
   time, batch TTFT, mean TPOT, and output throughput after each `generate` call.
-- `benchmarks/end_to_end.py` runs a fixed matrix over batch size and prompt
+- `benchmarks/e2e/end_to_end.py` runs a fixed matrix over batch size and prompt
   length and writes machine-readable JSON.
-- `benchmarks/attention_micro.py` isolates SDPA prefill and paged decode using
+- `benchmarks/micro/attention_micro.py` isolates SDPA prefill and paged decode using
   CUDA events and reports p50/p95 latency.
-- `benchmarks/profile_decode.py` exports a PyTorch CPU/CUDA Chrome trace and a
+- `benchmarks/micro/profile_decode.py` exports a PyTorch CPU/CUDA Chrome trace and a
   top-operator text summary.
 - Every JSON result embeds the software, GPU, compute capability, memory, and Git
   commit used to produce it.

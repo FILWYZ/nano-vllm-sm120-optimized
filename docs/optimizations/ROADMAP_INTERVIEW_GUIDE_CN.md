@@ -77,9 +77,9 @@ LLM.generate
 ### 3.2 如何实施
 
 - 在 `LLMEngine.last_metrics` 中记录 Prefill/Decode Token 数、迭代数、耗时、TTFT、平均 TPOT、输出吞吐和显存。
-- `benchmarks/end_to_end.py` 固定请求数与 Prompt 长度矩阵，并输出机器可读 JSON。
-- `benchmarks/attention_micro.py` 使用 CUDA Event 隔离测量 Attention Prefill/Decode 的 p50/p95。
-- `benchmarks/profile_decode.py` 生成 PyTorch Profiler 摘要与 Chrome Trace。
+- `benchmarks/e2e/end_to_end.py` 固定请求数与 Prompt 长度矩阵，并输出机器可读 JSON。
+- `benchmarks/micro/attention_micro.py` 使用 CUDA Event 隔离测量 Attention Prefill/Decode 的 p50/p95。
+- `benchmarks/micro/profile_decode.py` 生成 PyTorch Profiler 摘要与 Chrome Trace。
 - 每份 JSON 记录 GPU、计算能力、软件版本、显存与 Git Commit，防止跨环境错误比较。
 - 每个 Shape 先进行不计时 Warmup，再测稳态结果，排除 `torch.compile`、CUDA Context 和 Allocator 冷启动。
 
@@ -269,7 +269,7 @@ Page 越大，页表越短、Plan 开销可能越低；但每个活跃序列的�
 - FlashInfer/SDPA 本地默认改为 16；原 FlashAttention 兼容路径仍限制 256。
 - `Sequence` 页运算从 `Config` 同步，避免模块间 Page Size 不一致。
 - JSON 新增 Page Size、物理块数和原始 KV Token 容量。
-- `benchmarks/block_size_sweep.py` 为每个候选启动独立进程，避免 CUDA Allocator 与 Graph Pool 污染后续候选。
+- `benchmarks/analysis/block_size_sweep.py` 为每个候选启动独立进程，避免 CUDA Allocator 与 Graph Pool 污染后续候选。
 - 在实验前固定选择规则：**选择几何平均吞吐距最快值不超过 5% 的最小页**。
 
 ### 7.3 为什么选择规则必须预先声明

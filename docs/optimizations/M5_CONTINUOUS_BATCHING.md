@@ -47,7 +47,7 @@ remain green.
 
 ## Online arrival experiment
 
-`benchmarks/online_batching.py` starts a 64-token/24-output request, lets it
+`benchmarks/e2e/online_batching.py` starts a 64-token/24-output request, lets it
 produce four tokens, then injects a 512-token request split into 128-token
 chunks. Both policies receive a shape-matched unmeasured warmup in isolated
 processes.

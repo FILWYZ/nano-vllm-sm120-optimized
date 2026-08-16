@@ -4,7 +4,7 @@ set -euo pipefail
 baseline_root=/home/asus/projects/nano-vllm-baseline
 upstream_root=/home/asus/projects/nano-vllm-upstream-compat
 python_bin="$baseline_root/.venv/bin/python"
-runner="$baseline_root/benchmarks/upstream_ab.py"
+runner="$baseline_root/benchmarks/e2e/upstream_ab.py"
 model_path="/mnt/c/Users/ASUS/Documents/ChatGPT/算子/models/Qwen3-0.6B"
 
 run_one() {
