@@ -88,7 +88,7 @@ LRU/FIFO 指标可展示命中、冲突与逐出情况。稳定的离线前缀�
 
 ## 正确性门禁
 
-最终测试套件包含 21 项全部通过的 CPU/GPU 测试，覆盖：
+最终测试套件包含 23 项全部通过的 CPU/GPU 测试，覆盖：
 
 - SDPA Packed/Prefix/Decode 参考路径；
 - FlashInfer Ragged、Paged、Mixed 和 GQA Attention；

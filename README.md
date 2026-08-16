@@ -1,103 +1,134 @@
-<p align="center">
-<img width="300" src="assets/logo.png">
-</p>
+# nano-vLLM｜SM120 离线 LLM 推理引擎适配与性能优化
 
-<p align="center">
-<a href="https://trendshift.io/repositories/15323" target="_blank"><img src="https://trendshift.io/api/badge/repositories/15323" alt="GeeeekExplorer%2Fnano-vllm | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-</p>
+基于 [GeeeekExplorer/nano-vLLM](https://github.com/GeeeekExplorer/nano-vllm) 的教学型推理引擎实践项目。该分支面向 NVIDIA RTX 5060 Laptop（Blackwell SM120），目标是建立一个**可离线运行、可解释、可复现**的轻量级 LLM 推理系统，并以工程化方式验证每一项优化。
 
-# Nano-vLLM
+> 项目定位：学习型/研究型推理引擎，不声称等价于生产级 vLLM，也不声称相对官方 `vllm-project/vllm` 全面领先。
 
-A lightweight vLLM implementation built from scratch.
+## 项目亮点
 
-## Key Features
+- **硬件适配**：为 SM120 + PyTorch 2.11.0/cu128 建立可运行的 SDPA 兼容路径，并接入 FlashInfer 优化路径。
+- **推理优化**：覆盖 Paged Attention、无同步 KV Append、分桶 CUDA Graph、KV Page、连续批处理、Prefix Cache 和采样 Fast Path。
+- **高压调度优化**：针对长序列高显存压力场景，引入输出感知 KV Admission，减少抢占和重复 Prefill。
+- **工程验证**：每个里程碑保留 Git Tag、测试门禁、原始 JSON、消融实验和复现命令，支持从基线逐步回滚与定位。
 
-* 🚀 **Fast offline inference** - Comparable inference speeds to vLLM
-* 📖 **Readable codebase** - Clean implementation in ~ 1,200 lines of Python code
-* ⚡ **Optimization Suite** - Prefix caching, Tensor Parallelism, Torch compilation, CUDA graph, etc.
+## 技术栈
 
-## Installation
+`Python` · `PyTorch` · `CUDA` · `Triton` · `FlashInfer` · `WSL2` · `uv` · `unittest`
+
+## 系统流程
+
+```mermaid
+flowchart LR
+    A[Prompt 请求] --> B[Tokenizer / Sampling Params]
+    B --> C[Scheduler]
+    C --> D{Admission}
+    D -->|KV 容量足够| E[Prefill / Decode Batch]
+    D -->|容量不足| F[等待队列]
+    E --> G[Paged KV Cache]
+    G --> H[FlashInfer / SDPA Attention]
+    H --> I[Triton KV Append]
+    I --> J[CUDA Graph Decode]
+    J --> K[Sampling Fast Path]
+    K --> C
+    K --> L[输出 Token]
+```
+
+核心设计是将“请求调度、KV Cache 生命周期和 GPU 执行路径”作为一个整体优化：短请求使用在线 Mixed Batching；已知最大输出长度的离线长负载使用输出感知 KV 预留和 Prefill-first 配置。
+
+## M0–M8 优化路线
+
+| 阶段 | 主要工作 | 工程问题 |
+|---|---|---|
+| V0/M0 | SM120 SDPA 兼容基线、固定指标和 Profiler | 先建立可运行、可测量的基线 |
+| M1 | FlashInfer Paged Attention | 避免逐请求连续 KV 重建 |
+| M2 | Triton 无同步 KV Append | 减少 `nonzero`、标量提取和 Host 同步 |
+| M3 | 分桶式 Decode CUDA Graph | 降低 Decode 热路径的 Dispatch 开销 |
+| M4 | 16-token KV Page | 在容量利用率与页管理开销之间取平衡 |
+| M5 | Mixed Continuous Batching | 降低新 Prompt 到达时的 Decode 等待 |
+| M6 | LRU Prefix Cache | 显式观测命中、冲突、逐出和 Prefill 节省 |
+| M7 | Sampling Fast Path | 对确定性输出减少不必要的随机采样开销 |
+| M8 | 输出感知 KV Admission | 避免高压长负载中的抢占与重复 Prefill |
+
+详细的实现原因、代码入口、正确性门禁和阶段指标见 [`docs/optimizations/ROADMAP_INTERVIEW_GUIDE_CN.md`](docs/optimizations/ROADMAP_INTERVIEW_GUIDE_CN.md)。
+
+## 已验证结果
+
+### GitHub README 长负载 A/B
+
+测试条件：Qwen3-0.6B FP16、RTX 5060 Laptop SM120、256 个请求、随机输入/输出长度 100–1024、`seed=0`、`temperature=0.6`、`ignore_eos=True`、三轮独立运行。
+
+| 版本 | 中位吞吐 | 中位运行时间 | 峰值 Allocated 显存 |
+|---|---:|---:|---:|
+| 上游 SM120 Compat 基线 | 247.66 tok/s | 540.92 s | 5.96 GiB |
+| 优化版 M8 Offline | **1,898.00 tok/s** | **70.58 s** | 6.56 GiB |
+
+- 中位吞吐：**7.66×**（+666.4%）。
+- 中位运行时间：降低 **86.95%**。
+- M8 调度器抢占：**0 次**；实际 Prefill Token：**142,827**，与输入 Token 完全一致。
+- 峰值 Allocated 显存增加约 **10.1%**，主要用于 CUDA Graph、FlashInfer Workspace/Metadata 和 Decode KV 预留。
+
+### 固定形状矩阵
+
+在请求数 `{1, 4, 8}`、输入长度 `{64, 256}`、输出长度 `32` 的 6 组矩阵中，M7 相对 Compat 基线的几何平均中位加速比为 **8.23×**，36 个正式进程均生成预期 Token 数。
+
+这些结果只证明：在本项目明确记录的硬件、模型、软件版本和负载下，优化版优于 GitHub 上游派生的 **SM120 最小可运行兼容基线**。这不是对官方 vLLM，也不是对上游在其他 GPU/FlashAttention 环境的性能结论。
+
+## 复现环境
 
 ```bash
-pip install git+https://github.com/GeeeekExplorer/nano-vllm.git
+git clone <your-repository-url>
+cd nano-vllm-baseline
+
+uv venv --python 3.12
+source .venv/bin/activate
+uv pip install -e ".[flashinfer]"
+uv pip check
 ```
 
-### RTX 50 series / Blackwell
-
-Install the validated SM120 FlashInfer backend without replacing the project's
-PyTorch build:
+准备本地 Qwen3-0.6B 权重后，先运行正确性测试：
 
 ```bash
-uv pip install --python .venv/bin/python '.[flashinfer]'
+python -m unittest discover -s tests -v
 ```
 
-PyTorch SDPA remains the readable correctness fallback:
+运行统一上游 A/B 入口（根据本地模型路径调整）：
 
-```python
-from nanovllm import LLM
-
-llm = LLM(
-    "/YOUR/MODEL/PATH",
-    attention_backend="auto",  # selects FlashInfer on SM120 when installed
-    tensor_parallel_size=1,
-    max_model_len=512,
-    max_num_batched_tokens=512,
-    max_num_seqs=8,
-    gpu_memory_utilization=0.75,
-)
-```
-
-Use `attention_backend="sdpa"` for the readable compatibility path or
-`attention_backend="flashinfer"` for the optimized paged-attention path.
-FlashAttention remains optional for validated GPU/software combinations.
-FlashInfer uses bucketed decode CUDA Graphs; SDPA remains the eager reference.
-
-See [LOCAL_BASELINE.md](LOCAL_BASELINE.md) and run `bench_local.py` to reproduce
-the RTX 5060 Laptop baseline before making further optimizations.
-
-The complete local M0-M7 rationale, implementation notes, correctness gates,
-benchmarks, and rollback tags are indexed in
-[docs/optimizations/ROADMAP_RESULTS.md](docs/optimizations/ROADMAP_RESULTS.md).
-
-## Model Download
-
-To download the model weights manually, use the following command:
 ```bash
-huggingface-cli download --resume-download Qwen/Qwen3-0.6B \
-  --local-dir ~/huggingface/Qwen3-0.6B/ \
-  --local-dir-use-symlinks False
+python benchmarks/upstream_ab.py \
+  --model /path/to/Qwen3-0.6B \
+  --variant optimized_m8_offline \
+  --suite github \
+  --block-size 64 \
+  --reserve-output-kv \
+  --disable-mixed-batching \
+  --output benchmarks/results/m8_ab/optimized_m8_offline_github.json
+
+python benchmarks/summarize_m8.py
 ```
 
-## Quick Start
+完整实验计划和对比版本位于 [`docs/optimizations/M8_COMPARISON_PLAN.md`](docs/optimizations/M8_COMPARISON_PLAN.md) 和 [`docs/optimizations/M8_UPSTREAM_COMPARISON.md`](docs/optimizations/M8_UPSTREAM_COMPARISON.md)。大体积 Chrome Trace 未纳入版本控制，原始精简 JSON 和摘要保留在 `benchmarks/results/`。
 
-See `example.py` for usage. The API mirrors vLLM's interface with minor differences in the `LLM.generate` method:
-```python
-from nanovllm import LLM, SamplingParams
-llm = LLM("/YOUR/MODEL/PATH", enforce_eager=True, tensor_parallel_size=1)
-sampling_params = SamplingParams(temperature=0.6, max_tokens=256)
-prompts = ["Hello, Nano-vLLM."]
-outputs = llm.generate(prompts, sampling_params)
-outputs[0]["text"]
-```
+## 正确性与工程门禁
 
-## Benchmark
+- `python -m unittest discover -s tests -v`：23 项 CPU/GPU 测试通过。
+- `uv pip check`：63 个已安装依赖兼容。
+- 覆盖 SDPA/FlashInfer Attention、Triton KV 写入、CUDA Graph/Eager 对拍、页边界、Prefix Cache、混合调度器和采样路径。
+- 长负载三轮均生成 133,966 个输出 Token；每个后端内部三轮输出摘要稳定。
 
-See `bench.py` for benchmark.
+## 已知限制
 
-**Test Configuration:**
-- Hardware: RTX 4070 Laptop (8GB)
-- Model: Qwen3-0.6B
-- Total Requests: 256 sequences
-- Input Length: Randomly sampled between 100–1024 tokens
-- Output Length: Randomly sampled between 100–1024 tokens
+- 当前主要验证 Qwen3-0.6B FP16、单卡 8 GiB、RTX 5060 Laptop SM120 和离线长负载。
+- 尚未实现生产级 HTTP Server、LoRA、量化、Speculative Decoding、分布式 Serving 或多租户隔离。
+- 输出感知 KV 预留依赖已知 `max_tokens`，未知或严格在线公平性场景需要单独调度策略。
+- 兼容基线使用 SDPA fallback；不能将本项目的 7.66× 直接外推为相对官方 vLLM 的加速。
 
-**Performance Results:**
-| Inference Engine | Output Tokens | Time (s) | Throughput (tokens/s) |
-|----------------|-------------|----------|-----------------------|
-| vLLM           | 133,966     | 98.37    | 1361.84               |
-| Nano-vLLM      | 133,966     | 93.41    | 1434.13               |
+## 文档索引
 
+- [`ROADMAP_RESULTS.md`](docs/optimizations/ROADMAP_RESULTS.md)：阶段结果总览。
+- [`ROADMAP_INTERVIEW_GUIDE_CN.md`](docs/optimizations/ROADMAP_INTERVIEW_GUIDE_CN.md)：按大厂面试追问组织的技术讲解。
+- [`M8_UPSTREAM_COMPARISON.md`](docs/optimizations/M8_UPSTREAM_COMPARISON.md)：最终 A/B、消融和失败复盘。
+- [`RESUME_M8_CN.md`](docs/optimizations/RESUME_M8_CN.md)：基于已验证事实的简历口径。
 
-## Star History
+## 致谢与范围声明
 
-[![Star History Chart](https://api.star-history.com/svg?repos=GeeeekExplorer/nano-vllm&type=Date)](https://www.star-history.com/#GeeeekExplorer/nano-vllm&Date)
+本项目继承 [GeeeekExplorer/nano-vLLM](https://github.com/GeeeekExplorer/nano-vllm) 的教学代码和 MIT License，并在独立分支中进行本地硬件适配、性能实验和文档化改进。项目名称用于说明优化方向，不代表与上游项目或官方 vLLM 的从属关系。
