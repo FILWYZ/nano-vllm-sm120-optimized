@@ -169,10 +169,16 @@ class Attention(nn.Module):
                 outputs.append(self._sdpa(q[i:i + 1], k_i, v_i, is_causal=False))
         return torch.cat(outputs, dim=0)
 
-    def forward(self, q: torch.Tensor, k: torch.Tensor, v: torch.Tensor):
+    def forward(
+        self,
+        q: torch.Tensor,
+        k: torch.Tensor,
+        v: torch.Tensor,
+        kv_already_stored: bool = False,
+    ):
         context = get_context()
         k_cache, v_cache = self.k_cache, self.v_cache
-        if k_cache.numel() and v_cache.numel():
+        if k_cache.numel() and v_cache.numel() and not kv_already_stored:
             if self.backend in {"flash", "flashinfer"}:
                 store_kvcache(k, v, k_cache, v_cache, context.slot_mapping)
             else:

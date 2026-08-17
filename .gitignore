@@ -199,4 +199,5 @@ benchmarks/results/*_trace.json
 benchmarks/results/*
 !benchmarks/results/m8_upstream_comparison_summary.json
 !benchmarks/results/rmsnorm_ab_summary.json
+!benchmarks/results/qk_norm_rope_final_dispatch_ab_summary.json
 .cursorindexingignore

@@ -14,6 +14,7 @@ class Config:
     enforce_eager: bool = False
     attention_backend: str = "auto"
     rmsnorm_backend: str = "torch"
+    qk_norm_rope_backend: str = "torch"
     hf_config: AutoConfig | None = None
     eos: int = -1
     kvcache_block_size: int = 16
@@ -32,6 +33,7 @@ class Config:
         assert 1 <= self.tensor_parallel_size <= 8
         assert self.attention_backend in {"auto", "flash", "flashinfer", "sdpa"}
         assert self.rmsnorm_backend in {"auto", "torch", "sm120"}
+        assert self.qk_norm_rope_backend in {"auto", "torch", "sm120"}
         self.hf_config = AutoConfig.from_pretrained(self.model)
         assert self.max_prefill_chunk_size > 0
         self.max_model_len = min(self.max_model_len, self.hf_config.max_position_embeddings)

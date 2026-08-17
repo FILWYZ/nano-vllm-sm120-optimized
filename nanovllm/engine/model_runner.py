@@ -11,6 +11,7 @@ from nanovllm.layers.sampler import Sampler
 from nanovllm.layers.attention import set_attention_backend
 from nanovllm.layers.flashinfer_backend import prepare_flashinfer_decode_graph
 from nanovllm.layers.layernorm import set_rmsnorm_backend
+from nanovllm.layers.qk_norm_rope import set_qk_norm_rope_backend
 from nanovllm.utils.context import set_context, get_context, reset_context
 from nanovllm.utils.loader import load_model
 
@@ -29,6 +30,9 @@ class ModelRunner:
         torch.cuda.set_device(rank)
         config.attention_backend = set_attention_backend(config.attention_backend)
         config.rmsnorm_backend = set_rmsnorm_backend(config.rmsnorm_backend)
+        config.qk_norm_rope_backend = set_qk_norm_rope_backend(
+            config.qk_norm_rope_backend
+        )
         compatibility_backend = config.attention_backend == "sdpa"
         self.enforce_eager = config.enforce_eager or compatibility_backend
         if compatibility_backend and not config.enforce_eager and rank == 0:

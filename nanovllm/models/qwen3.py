@@ -8,6 +8,12 @@ from nanovllm.layers.attention import Attention
 from nanovllm.layers.layernorm import RMSNorm
 from nanovllm.layers.linear import QKVParallelLinear, MergedColumnParallelLinear, RowParallelLinear
 from nanovllm.layers.rotary_embedding import get_rope
+from nanovllm.layers.qk_norm_rope import (
+    apply_sm120_qk_norm_rope,
+    apply_sm120_qk_norm_rope_kv,
+    use_sm120_qk_norm_rope,
+)
+from nanovllm.utils.context import get_context
 from nanovllm.layers.embed_head import VocabParallelEmbedding, ParallelLMHead
 
 
@@ -79,11 +85,51 @@ class Qwen3Attention(nn.Module):
         q = q.view(-1, self.num_heads, self.head_dim)
         k = k.view(-1, self.num_kv_heads, self.head_dim)
         v = v.view(-1, self.num_kv_heads, self.head_dim)
+        kv_already_stored = False
         if not self.qkv_bias:
-            q = self.q_norm(q)
-            k = self.k_norm(k)
-        q, k = self.rotary_emb(positions, q, k)
-        o = self.attn(q, k, v)
+            context = get_context()
+            # Inductor remains stronger for the wide prefill launch. The SM120
+            # kernel is dispatched only for decode, where removing three
+            # elementwise launches plus KV append consistently wins end to end.
+            if (
+                not context.is_prefill
+                and q.size(0) == 1
+                and use_sm120_qk_norm_rope(
+                    q, k, positions, self.rotary_emb.cos_sin_cache
+                )
+            ):
+                if self.attn.k_cache.numel() and self.attn.v_cache.numel():
+                    q, k = apply_sm120_qk_norm_rope_kv(
+                        q,
+                        k,
+                        v,
+                        self.q_norm.weight,
+                        self.k_norm.weight,
+                        positions,
+                        self.rotary_emb.cos_sin_cache,
+                        self.attn.k_cache,
+                        self.attn.v_cache,
+                        context.slot_mapping,
+                        self.q_norm.eps,
+                    )
+                    kv_already_stored = True
+                else:
+                    q, k = apply_sm120_qk_norm_rope(
+                        q,
+                        k,
+                        self.q_norm.weight,
+                        self.k_norm.weight,
+                        positions,
+                        self.rotary_emb.cos_sin_cache,
+                        self.q_norm.eps,
+                    )
+            else:
+                q = self.q_norm(q)
+                k = self.k_norm(k)
+                q, k = self.rotary_emb(positions, q, k)
+        else:
+            q, k = self.rotary_emb(positions, q, k)
+        o = self.attn(q, k, v, kv_already_stored=kv_already_stored)
         output = self.o_proj(o.flatten(1, -1))
         return output
 
