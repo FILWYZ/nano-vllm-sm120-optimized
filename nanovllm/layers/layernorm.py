@@ -1,6 +1,29 @@
 import torch
 from torch import nn
 
+try:
+    from sm120_rmsnorm import fused_add_rms_norm_inplace
+except ImportError:
+    fused_add_rms_norm_inplace = None
+
+
+_RMSNORM_BACKEND = "torch"
+
+
+def set_rmsnorm_backend(backend: str) -> str:
+    global _RMSNORM_BACKEND
+    if backend == "auto":
+        is_sm120 = torch.cuda.is_available() and torch.cuda.get_device_capability() == (12, 0)
+        backend = "sm120" if is_sm120 and fused_add_rms_norm_inplace is not None else "torch"
+    if backend not in {"torch", "sm120"}:
+        raise ValueError(f"unsupported RMSNorm backend: {backend}")
+    if backend == "sm120" and fused_add_rms_norm_inplace is None:
+        raise RuntimeError(
+            "SM120 RMSNorm backend requested, but sm120_rmsnorm is not installed"
+        )
+    _RMSNORM_BACKEND = backend
+    return backend
+
 
 class RMSNorm(nn.Module):
 
@@ -46,5 +69,13 @@ class RMSNorm(nn.Module):
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         if residual is None:
             return self.rms_forward(x)
-        else:
-            return self.add_rms_forward(x, residual)
+        if (
+            _RMSNORM_BACKEND == "sm120"
+            and x.is_cuda
+            and x.is_contiguous()
+            and residual.is_contiguous()
+            and self.weight.is_contiguous()
+        ):
+            fused_add_rms_norm_inplace(x, residual, self.weight, self.eps)
+            return x, residual
+        return self.add_rms_forward(x, residual)

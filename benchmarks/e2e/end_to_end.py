@@ -23,6 +23,8 @@ def parse_args():
     parser.add_argument("--output", default="benchmarks/results/latest.json")
     parser.add_argument("--backend", default="auto",
                         choices=["auto", "sdpa", "flashinfer", "flash"])
+    parser.add_argument("--rmsnorm-backend", default="torch",
+                        choices=["auto", "torch", "sm120"])
     parser.add_argument("--max-model-len", type=int, default=512)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
     parser.add_argument("--block-size", type=int, default=16)
@@ -45,6 +47,7 @@ def main():
     llm = LLM(
         args.model,
         attention_backend=args.backend,
+        rmsnorm_backend=args.rmsnorm_backend,
         enforce_eager=args.enforce_eager,
         tensor_parallel_size=1,
         max_model_len=args.max_model_len,
@@ -102,6 +105,8 @@ def main():
             "model": args.model,
             "requested_backend": args.backend,
             "resolved_backend": llm.model_runner.config.attention_backend,
+            "requested_rmsnorm_backend": args.rmsnorm_backend,
+            "resolved_rmsnorm_backend": llm.model_runner.config.rmsnorm_backend,
             "max_model_len": args.max_model_len,
             "gpu_memory_utilization": args.gpu_memory_utilization,
             "warmup_repeats": args.warmup_repeats,

@@ -198,4 +198,5 @@ benchmarks/results/*_trace.json
 # Intermediate benchmark outputs are local artifacts; retain only the final summary.
 benchmarks/results/*
 !benchmarks/results/m8_upstream_comparison_summary.json
+!benchmarks/results/rmsnorm_ab_summary.json
 .cursorindexingignore

@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "timestamp_utc": "2026-08-17T07:42:06.756135+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "97795aa9d11fb0a466c65fd4b6ccee36cc497f92"
+  },
+  "protocol": {
+    "independent_processes_per_backend": 3,
+    "within_process_repeats": 2,
+    "warmup_repeats": 1,
+    "run_order": [
+      "torch",
+      "sm120",
+      "sm120",
+      "torch",
+      "torch",
+      "sm120"
+    ]
+  },
+  "workloads": [
+    {
+      "requests": 1,
+      "input_len": 64,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 195.45997951283275,
+          "decode_tokens_per_second": 214.85676371891302,
+          "mean_tpot_seconds": 0.004654306468212106
+        },
+        "sm120": {
+          "output_tokens_per_second": 201.3319908096414,
+          "decode_tokens_per_second": 217.4749584329308,
+          "mean_tpot_seconds": 0.004598248080583289
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            197.2640827087771,
+            195.45997951283275,
+            187.8718627470122
+          ],
+          "decode_tokens_per_second": [
+            216.1045656923855,
+            214.85676371891302,
+            205.8341887392091
+          ],
+          "mean_tpot_seconds": [
+            0.004627927032303095,
+            0.004654306468212106,
+            0.0048613676298109275
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            183.60604356422618,
+            201.3319908096414,
+            204.53130026793792
+          ],
+          "decode_tokens_per_second": [
+            202.98236344845543,
+            217.4749584329308,
+            220.4017513955087
+          ],
+          "mean_tpot_seconds": [
+            0.004937840500309492,
+            0.004598248080583289,
+            0.004537384436961504
+          ]
+        }
+      },
+      "output_throughput_change_pct": 3.004201326248035,
+      "decode_throughput_change_pct": 1.2185768177366052,
+      "tpot_change_pct": -1.204441263412348
+    },
+    {
+      "requests": 4,
+      "input_len": 64,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 761.6907216160319,
+          "decode_tokens_per_second": 833.7236003445042,
+          "mean_tpot_seconds": 0.004797757160098802
+        },
+        "sm120": {
+          "output_tokens_per_second": 790.2893193782174,
+          "decode_tokens_per_second": 853.4734476085296,
+          "mean_tpot_seconds": 0.004686753661277884
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            758.711990633075,
+            775.4782284524201,
+            761.6907216160319
+          ],
+          "decode_tokens_per_second": [
+            831.7463686614108,
+            852.4186223058532,
+            833.7236003445042
+          ],
+          "mean_tpot_seconds": [
+            0.00481292977412757,
+            0.0046925382395725575,
+            0.004797757160098802
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            788.206578289921,
+            790.2893193782174,
+            796.0378109402727
+          ],
+          "decode_tokens_per_second": [
+            852.0338560523595,
+            853.4734476085296,
+            857.0558215277961
+          ],
+          "mean_tpot_seconds": [
+            0.0046946501458859854,
+            0.004686753661277884,
+            0.004667193241109471
+          ]
+        }
+      },
+      "output_throughput_change_pct": 3.7546207339259396,
+      "decode_throughput_change_pct": 2.368872280437362,
+      "tpot_change_pct": -2.3136539661509636
+    },
+    {
+      "requests": 8,
+      "input_len": 64,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 1475.458290463775,
+          "decode_tokens_per_second": 1629.2659967641173,
+          "mean_tpot_seconds": 0.004910242726891152
+        },
+        "sm120": {
+          "output_tokens_per_second": 1504.7254618106913,
+          "decode_tokens_per_second": 1658.157358604266,
+          "mean_tpot_seconds": 0.004824656192325957
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            1475.458290463775,
+            1489.4991318474904,
+            1472.1035434463834
+          ],
+          "decode_tokens_per_second": [
+            1626.561243502812,
+            1646.921679277052,
+            1629.2659967641173
+          ],
+          "mean_tpot_seconds": [
+            0.004919525871012029,
+            0.004857593517836874,
+            0.004910242726891152
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            1451.8208278982715,
+            1504.7254618106913,
+            1515.6689894172537
+          ],
+          "decode_tokens_per_second": [
+            1601.8859853344657,
+            1658.157358604266,
+            1671.4634495507976
+          ],
+          "mean_tpot_seconds": [
+            0.005000934710786227,
+            0.004824656192325957,
+            0.0047863784031153865
+          ]
+        }
+      },
+      "output_throughput_change_pct": 1.9835986917472903,
+      "decode_throughput_change_pct": 1.7732747076002253,
+      "tpot_change_pct": -1.7430204437038577
+    },
+    {
+      "requests": 1,
+      "input_len": 256,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 194.4684866265864,
+          "decode_tokens_per_second": 212.95286069014986,
+          "mean_tpot_seconds": 0.004695896835689764
+        },
+        "sm120": {
+          "output_tokens_per_second": 198.2846874912265,
+          "decode_tokens_per_second": 214.23627211236322,
+          "mean_tpot_seconds": 0.004667863483548224
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            180.6668283197546,
+            194.4684866265864,
+            195.04430169804365
+          ],
+          "decode_tokens_per_second": [
+            204.6968674089926,
+            212.95286069014986,
+            213.62308315213693
+          ],
+          "mean_tpot_seconds": [
+            0.004886316645312153,
+            0.004695896835689764,
+            0.004681147209222188
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            197.13860233406166,
+            198.2846874912265,
+            199.33312212335431
+          ],
+          "decode_tokens_per_second": [
+            212.02413046609453,
+            214.23627211236322,
+            214.4853158255611
+          ],
+          "mean_tpot_seconds": [
+            0.004716536354540187,
+            0.004667863483548224,
+            0.0046623606932342
+          ]
+        }
+      },
+      "output_throughput_change_pct": 1.9623749486814557,
+      "decode_throughput_change_pct": 0.6026739523733227,
+      "tpot_change_pct": -0.5969754686363626
+    },
+    {
+      "requests": 4,
+      "input_len": 256,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 680.9634667266727,
+          "decode_tokens_per_second": 804.4444130503097,
+          "mean_tpot_seconds": 0.004972438241595462
+        },
+        "sm120": {
+          "output_tokens_per_second": 685.2775338677055,
+          "decode_tokens_per_second": 810.400800996897,
+          "mean_tpot_seconds": 0.004936040369249249
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            679.9495769349619,
+            680.9634667266727,
+            684.2318049001415
+          ],
+          "decode_tokens_per_second": [
+            802.7004351991006,
+            804.4444130503097,
+            808.5799054355939
+          ],
+          "mean_tpot_seconds": [
+            0.004984524982583318,
+            0.004972438241595462,
+            0.004946946885602007
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            636.8106321161048,
+            685.2775338677055,
+            692.3860592136293
+          ],
+          "decode_tokens_per_second": [
+            743.8490755016628,
+            810.400800996897,
+            818.7826647390749
+          ],
+          "mean_tpot_seconds": [
+            0.005379349967810296,
+            0.004936040369249249,
+            0.004885305790418399
+          ]
+        }
+      },
+      "output_throughput_change_pct": 0.6335240217467453,
+      "decode_throughput_change_pct": 0.7404349946320998,
+      "tpot_change_pct": -0.7319924467183436
+    },
+    {
+      "requests": 8,
+      "input_len": 256,
+      "output_len": 32,
+      "median": {
+        "torch": {
+          "output_tokens_per_second": 1127.8970282636028,
+          "decode_tokens_per_second": 1499.3260009754035,
+          "mean_tpot_seconds": 0.005335791822290048
+        },
+        "sm120": {
+          "output_tokens_per_second": 1128.326792319696,
+          "decode_tokens_per_second": 1497.286838383303,
+          "mean_tpot_seconds": 0.00534307251913443
+        }
+      },
+      "independent_runs": {
+        "torch": {
+          "output_tokens_per_second": [
+            1093.280419255445,
+            1127.8970282636028,
+            1129.418448351794
+          ],
+          "decode_tokens_per_second": [
+            1436.4461556656981,
+            1499.3260009754035,
+            1502.9423758335824
+          ],
+          "mean_tpot_seconds": [
+            0.005569470871236146,
+            0.005335791822290048,
+            0.005323046241462561
+          ]
+        },
+        "sm120": {
+          "output_tokens_per_second": [
+            1128.326792319696,
+            1122.6084814215515,
+            1134.3831591755543
+          ],
+          "decode_tokens_per_second": [
+            1497.286838383303,
+            1486.5043306239859,
+            1508.0938352719959
+          ],
+          "mean_tpot_seconds": [
+            0.00534307251913443,
+            0.005381840934147007,
+            0.005305252565097274
+          ]
+        }
+      },
+      "output_throughput_change_pct": 0.03810312868319787,
+      "decode_throughput_change_pct": -0.1360052844260662,
+      "tpot_change_pct": 0.13645016685184252
+    }
+  ]
+}
