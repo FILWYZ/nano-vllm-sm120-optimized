@@ -2,7 +2,7 @@
 
 基于 [GeeeekExplorer/nano-vLLM](https://github.com/GeeeekExplorer/nano-vllm) 的教学型推理引擎实践项目。该分支面向 NVIDIA RTX 5060 Laptop（Blackwell SM120），目标是建立一个**可离线运行、可解释、可复现**的轻量级 LLM 推理系统，并以工程化方式验证每一项优化。
 
-> 项目定位：学习型/研究型推理引擎，不声称等价于生产级 vLLM，也不声称相对官方 `vllm-project/vllm` 全面领先。
+> 项目定位：学习型/研究型推理引擎。
 
 ## 项目亮点
 
