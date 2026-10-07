@@ -1,0 +1,66 @@
+{
+  "method": "alternating_independent_processes",
+  "runs_per_policy": 5,
+  "results": {
+    "mixed": {
+      "mean_inter_token_gap_seconds": {
+        "median": 0.007621178100816905,
+        "mean": 0.007614121979568154,
+        "stdev": 9.203494275086432e-05,
+        "min": 0.007488753646612167,
+        "max": 0.007731377449817956
+      },
+      "p95_inter_token_gap_seconds": {
+        "median": 0.01927797996904701,
+        "mean": 0.01921480039600283,
+        "stdev": 0.0003958076721928605,
+        "min": 0.01865738397464156,
+        "max": 0.019691932015120983
+      },
+      "max_inter_token_gap_seconds": {
+        "median": 0.019943240913562477,
+        "mean": 0.01985832618083805,
+        "stdev": 0.0004303957829261411,
+        "min": 0.01917357393540442,
+        "max": 0.02034110203385353
+      },
+      "raw_files": [
+        "01_mixed.json",
+        "04_mixed.json",
+        "05_mixed.json",
+        "08_mixed.json",
+        "09_mixed.json"
+      ]
+    },
+    "prefill-first": {
+      "mean_inter_token_gap_seconds": {
+        "median": 0.008508022304158657,
+        "mean": 0.008827815899858251,
+        "stdev": 0.0006714770260812248,
+        "min": 0.008457388100214302,
+        "max": 0.010022577649215237
+      },
+      "p95_inter_token_gap_seconds": {
+        "median": 0.005256960983388126,
+        "mean": 0.005326926801353693,
+        "stdev": 0.00043046339030480374,
+        "min": 0.004970444017089903,
+        "max": 0.006062895990908146
+      },
+      "max_inter_token_gap_seconds": {
+        "median": 0.08090274105779827,
+        "mean": 0.08505624141544103,
+        "stdev": 0.00811598168095635,
+        "min": 0.08028041699435562,
+        "max": 0.09935262007638812
+      },
+      "raw_files": [
+        "02_prefill-first.json",
+        "03_prefill-first.json",
+        "06_prefill-first.json",
+        "07_prefill-first.json",
+        "10_prefill-first.json"
+      ]
+    }
+  }
+}
