@@ -207,3 +207,7 @@ benchmarks/results/*
 !benchmarks/results/edge_baseline_20261007/BASELINE_REPORT.md
 !benchmarks/results/edge_baseline_20261007/OPTIMIZATION_PLAN.md
 !benchmarks/results/edge_baseline_20261007/current_engine_baseline.json
+
+# Reproducible local edge acceptance artifacts
+!benchmarks/results/edge_acceptance_20261007/
+!benchmarks/results/edge_acceptance_20261007/**

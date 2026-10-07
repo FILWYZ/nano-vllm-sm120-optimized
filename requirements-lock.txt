@@ -1,3 +1,5 @@
+# Validated WSL2/Python 3.12 package snapshot; install PyTorch from the cu128 index first.
+# The optional local SM120 extension is built from its companion source and is intentionally excluded.
 annotated-doc==0.0.5
 anyio==4.15.1
 apache-tvm-ffi==0.1.14.post1
@@ -23,7 +25,6 @@ markdown-it-py==4.2.0
 markupsafe==3.0.3
 mdurl==0.1.2
 mpmath==1.3.0
--e file:///home/asus/nano-vllm
 networkx==3.6.1
 ninja==1.13.2
 numpy==2.5.3
@@ -61,7 +62,6 @@ rich==15.0.0
 safetensors==0.8.0
 setuptools==78.1.0
 shellingham==1.5.4
-sm120-fused-rmsnorm @ file:///tmp/sm120-norm-fusion-kernels-main-20261007
 sympy==1.14.0
 tabulate==0.10.0
 tokenizers==0.23.2

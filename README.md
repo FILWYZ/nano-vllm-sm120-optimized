@@ -129,7 +129,7 @@ Qwen3-0.6B BF16、五个独立进程、A/B 交替顺序的最终结果：
 
 ## 工程验证
 
-- nano-vLLM：`41 passed`，另有 `5 subtests passed`。
+- nano-vLLM 原有回归：`41 passed`，另有 `5 subtests passed`；本次新增取消回收用例后为 `43 passed`。
 - CUDA 算子仓库：`180 passed`。
 - Compute Sanitizer：memcheck `0 errors`，racecheck `0 hazards`。
 - 自定义算子通过 `torch.compile(fullgraph=True)`、CUDA Graph capture/replay。
@@ -143,10 +143,8 @@ Qwen3-0.6B BF16、五个独立进程、A/B 交替顺序的最终结果：
 git clone https://github.com/FILWYZ/nano-vllm-sm120-optimized.git
 cd nano-vllm-sm120-optimized
 
-uv venv --python 3.12
+bash scripts/setup_wsl.sh
 source .venv/bin/activate
-uv pip install -e ".[flashinfer]"
-uv pip check
 pytest -q
 ```
 
@@ -190,12 +188,15 @@ benchmarks/                  Micro、E2E、A/B 与结果汇总
 tests/                       正确性和后端一致性测试
 ```
 
+## 本机端侧服务
+
+本项目提供 loopback-only 的 OpenAI 兼容本机 API。启动和接口说明见 [docs/LOCAL_API.md](docs/LOCAL_API.md)。服务默认限制上下文、并发和 GPU 显存预算，支持流式文本、排队限额与断连取消。
+
 ## 适用范围与限制
 
 - 主要验证 Qwen3-0.6B、单卡 8 GiB、RTX 5060 Laptop SM120 和离线负载。
 - M8 长负载记录使用 FP16；M10 Q/K 融合记录使用当前模型配置的 BF16。
-- 尚未实现 HTTP Server、LoRA、量化、Speculative Decoding、多卡并行和
-  多租户隔离。
+- 尚未实现 LoRA、权重量化、Speculative Decoding、多卡并行和多租户隔离。
 - 输出感知 KV 预留适用于已知 `max_tokens` 的离线负载；未知输出长度或
   强在线公平性场景需要不同 Admission 策略。
 - 自定义 CUDA kernel 只在经 A/B 验证的窄形状启用，不能外推到其他 GPU、

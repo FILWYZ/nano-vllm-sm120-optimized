@@ -89,6 +89,29 @@ class TestMixedScheduler(unittest.TestCase):
         self.assertEqual(list(scheduler.waiting), [first, second])
         self.assertEqual(scheduler.metrics["prefill_chunks"], 2)
 
+    def test_cancel_waiting_request_removes_it(self):
+        scheduler = Scheduler(config())
+        seq = Sequence(list(range(12)))
+        scheduler.add(seq)
+
+        self.assertTrue(scheduler.cancel(seq))
+        self.assertEqual(seq.status, SequenceStatus.CANCELLED)
+        self.assertTrue(scheduler.is_finished())
+        self.assertFalse(scheduler.cancel(seq))
+
+    def test_cancel_running_request_releases_kv_blocks(self):
+        scheduler = Scheduler(config())
+        seq = self.add_running(scheduler, length=20)
+        allocated = len(seq.block_table)
+
+        self.assertTrue(scheduler.cancel(seq))
+
+        self.assertEqual(seq.status, SequenceStatus.CANCELLED)
+        self.assertNotIn(seq, scheduler.running)
+        self.assertEqual(len(scheduler.block_manager.free_block_ids), 64)
+        self.assertEqual(allocated, 2)
+        self.assertEqual(seq.block_table, [])
+
     def test_decode_candidate_cannot_preempt_already_scheduled_sequence(self):
         constrained = config()
         constrained.num_kvcache_blocks = 3
