@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "comparison_scope": {
+    "upstream_github_commit": "bb823b3e06983d71485a8e1f23715ebd87d98ef8",
+    "upstream_sm120_compat_commit": "7aa1f251cf1e041ded3371bab41f90e6736111ac",
+    "optimized_m7_code_commit": "56fc37163d572aae5c95e1408f0d723f90d58fe5",
+    "m8_offline_admission_commit": "2133478",
+    "device": "NVIDIA GeForce RTX 5060",
+    "model": "/mnt/c/Users/ASUS/Documents/ChatGPT/\u7b97\u5b50/models/Qwen3-0.6B"
+  },
+  "fixed_matrix": {
+    "repeats_per_shape": 3,
+    "workloads": [
+      {
+        "requests": 1,
+        "input_len": 64,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            27.34620694255073,
+            27.509443549179647,
+            27.327570243676526
+          ],
+          "median": 27.34620694255073,
+          "min": 27.327570243676526,
+          "max": 27.509443549179647
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            195.2769117845596,
+            198.51634959542685,
+            197.76993631258935
+          ],
+          "median": 197.76993631258935,
+          "min": 195.2769117845596,
+          "max": 198.51634959542685
+        },
+        "median_speedup": 7.232079268911664
+      },
+      {
+        "requests": 4,
+        "input_len": 64,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            87.33194432494447,
+            87.66033651668727,
+            87.42505679102298
+          ],
+          "median": 87.42505679102298,
+          "min": 87.33194432494447,
+          "max": 87.66033651668727
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            781.8464442322215,
+            786.1650526573395,
+            644.4380580149242
+          ],
+          "median": 781.8464442322215,
+          "min": 644.4380580149242,
+          "max": 786.1650526573395
+        },
+        "median_speedup": 8.943047599055188
+      },
+      {
+        "requests": 8,
+        "input_len": 64,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            141.61281217619035,
+            143.33946190899414,
+            141.13457248137343
+          ],
+          "median": 141.61281217619035,
+          "min": 141.13457248137343,
+          "max": 143.33946190899414
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            1471.3358121569809,
+            1463.5183688072534,
+            1418.3231887357106
+          ],
+          "median": 1463.5183688072534,
+          "min": 1418.3231887357106,
+          "max": 1471.3358121569809
+        },
+        "median_speedup": 10.334646606596502
+      },
+      {
+        "requests": 1,
+        "input_len": 256,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            27.41733253125577,
+            27.53172495943331,
+            27.122268108429456
+          ],
+          "median": 27.41733253125577,
+          "min": 27.122268108429456,
+          "max": 27.53172495943331
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            193.61517183958813,
+            192.77594902745147,
+            193.6664052966983
+          ],
+          "median": 193.61517183958813,
+          "min": 192.77594902745147,
+          "max": 193.6664052966983
+        },
+        "median_speedup": 7.061780048035919
+      },
+      {
+        "requests": 4,
+        "input_len": 256,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            84.52454662853161,
+            85.37164289049639,
+            84.0871290072426
+          ],
+          "median": 84.52454662853161,
+          "min": 84.0871290072426,
+          "max": 85.37164289049639
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            670.6173889586705,
+            688.3687758435599,
+            667.2323545916763
+          ],
+          "median": 670.6173889586705,
+          "min": 667.2323545916763,
+          "max": 688.3687758435599
+        },
+        "median_speedup": 7.933995693652155
+      },
+      {
+        "requests": 8,
+        "input_len": 256,
+        "output_len": 32,
+        "upstream_compat_tok_s": {
+          "values": [
+            135.33318250318607,
+            128.35692183579602,
+            136.70631976054574
+          ],
+          "median": 135.33318250318607,
+          "min": 128.35692183579602,
+          "max": 136.70631976054574
+        },
+        "optimized_m7_tok_s": {
+          "values": [
+            1125.3976483724523,
+            1076.8840845214265,
+            1132.5339142027149
+          ],
+          "median": 1125.3976483724523,
+          "min": 1076.8840845214265,
+          "max": 1132.5339142027149
+        },
+        "median_speedup": 8.315755438219727
+      }
+    ],
+    "geomean_median_speedup": 8.233011100848769
+  },
+  "github_readme_workload": {
+    "repeats": 3,
+    "requests": 256,
+    "input_tokens": 142827,
+    "output_tokens": 133966,
+    "upstream_compat_tok_s": {
+      "values": [
+        245.77888531220114,
+        248.4489636221757,
+        247.66324621038572
+      ],
+      "median": 247.66324621038572,
+      "min": 245.77888531220114,
+      "max": 248.4489636221757
+    },
+    "optimized_m8_tok_s": {
+      "values": [
+        1901.7703504798046,
+        1882.3536609039868,
+        1897.9988149449182
+      ],
+      "median": 1897.9988149449182,
+      "min": 1882.3536609039868,
+      "max": 1901.7703504798046
+    },
+    "upstream_compat_seconds": {
+      "values": [
+        545.0671640479995,
+        539.209333163999,
+        540.9199873210018
+      ],
+      "median": 540.9199873210018,
+      "min": 539.209333163999,
+      "max": 545.0671640479995
+    },
+    "optimized_m8_seconds": {
+      "values": [
+        70.44278504300019,
+        71.16941028800284,
+        70.58276272100193
+      ],
+      "median": 70.58276272100193,
+      "min": 70.44278504300019,
+      "max": 71.16941028800284
+    },
+    "upstream_peak_allocated_gib": {
+      "values": [
+        5.9566264152526855,
+        5.9566264152526855,
+        5.9566264152526855
+      ],
+      "median": 5.9566264152526855,
+      "min": 5.9566264152526855,
+      "max": 5.9566264152526855
+    },
+    "optimized_peak_allocated_gib": {
+      "values": [
+        6.555718421936035,
+        6.555718421936035,
+        6.555718421936035
+      ],
+      "median": 6.555718421936035,
+      "min": 6.555718421936035,
+      "max": 6.555718421936035
+    },
+    "median_speedup": 7.663627300324572,
+    "median_throughput_gain_percent": 666.3627300324572,
+    "median_time_reduction_percent": 86.95134874372548,
+    "median_peak_memory_change_percent": 10.057572271937353,
+    "upstream_output_hash_stable": true,
+    "optimized_output_hash_stable": true,
+    "optimized_scheduler": {
+      "prefill_chunks": 393,
+      "mixed_batches": 0,
+      "prefill_only_batches": 328,
+      "decode_only_batches": 5066,
+      "preemptions": 0
+    },
+    "optimized_prefill_tokens": 142827
+  }
+}

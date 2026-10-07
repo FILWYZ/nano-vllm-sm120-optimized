@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nano-vllm"
+version = "0.2.0"
+authors = [{ name = "Xingkai Yu" }]
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+description = "SM120-compatible offline LLM inference engine with paged KV cache and scheduler optimizations"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "torch>=2.4.0",
+    "triton>=3.0.0",
+    "transformers>=4.51.0",
+    "xxhash",
+]
+
+[project.optional-dependencies]
+flash-attn = ["flash-attn"]
+flashinfer = ["flashinfer-python==0.6.6", "ninja>=1.11"]
+
+[project.urls]
+Homepage="https://github.com/FILWYZ/nano-vllm-sm120-optimized"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["nanovllm*"]

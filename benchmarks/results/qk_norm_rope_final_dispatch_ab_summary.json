@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "runs_per_backend": 5,
+  "method": "independent processes, alternating A/B order, median across runs",
+  "environment": {
+    "timestamp_utc": "2026-08-17T08:44:10.400658+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "d028c0b88e322cbc368273b8fef45da0f96cbb57"
+  },
+  "config": {
+    "model": "/home/asus/models/Qwen3-0.6B",
+    "requested_backend": "flashinfer",
+    "resolved_backend": "flashinfer",
+    "requested_rmsnorm_backend": "sm120",
+    "resolved_rmsnorm_backend": "sm120",
+    "requested_qk_norm_rope_backend": "sm120",
+    "resolved_qk_norm_rope_backend": "sm120",
+    "max_model_len": 512,
+    "gpu_memory_utilization": 0.75,
+    "warmup_repeats": 1,
+    "repeats": 2,
+    "enforce_eager": false,
+    "kvcache_block_size": 16,
+    "num_kvcache_blocks": 1976,
+    "kvcache_capacity_tokens": 31616,
+    "temperature": 0.6
+  },
+  "workloads": [
+    {
+      "requests": 1,
+      "input_len": 64,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 4011.0373112268853,
+        "sm120_median": 4044.8280733568026,
+        "improvement_percent": 0.8424444727885394
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 217.6691601303529,
+        "sm120_median": 221.52562173931432,
+        "improvement_percent": 1.7717078554683408
+      },
+      "output_tokens_per_second": {
+        "torch_median": 201.93761289105862,
+        "sm120_median": 204.4407151247786,
+        "improvement_percent": 1.2395423506716075
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.01596043950121384,
+        "sm120_median": 0.015827801995328628,
+        "improvement_percent": 0.8310391820671725
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.004594134067789832,
+        "sm120_median": 0.004514242177397283,
+        "improvement_percent": 1.7389978005361684
+      }
+    },
+    {
+      "requests": 4,
+      "input_len": 64,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 16084.720843940871,
+        "sm120_median": 16227.744883577514,
+        "improvement_percent": 0.8891919295604067
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 856.1289579989405,
+        "sm120_median": 850.3398730999702,
+        "improvement_percent": -0.6761930950801243
+      },
+      "output_tokens_per_second": {
+        "torch_median": 793.8010407166018,
+        "sm120_median": 790.0181441284228,
+        "improvement_percent": -0.476554752909375
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.015922515507554635,
+        "sm120_median": 0.015775458014104515,
+        "improvement_percent": 0.9235820394104644
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.004672279643859984,
+        "sm120_median": 0.004704127769312641,
+        "improvement_percent": -0.6816399676442764
+      }
+    },
+    {
+      "requests": 8,
+      "input_len": 64,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 24960.564256801525,
+        "sm120_median": 24996.724391437063,
+        "improvement_percent": 0.14486905930295446
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 1655.9819993286178,
+        "sm120_median": 1658.182649895291,
+        "improvement_percent": 0.13289097149398188
+      },
+      "output_tokens_per_second": {
+        "torch_median": 1498.62229280893,
+        "sm120_median": 1501.736820592348,
+        "improvement_percent": 0.20782606787332902
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.02051235800900031,
+        "sm120_median": 0.020482770007220097,
+        "improvement_percent": 0.1442447609739883
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.00483097038710595,
+        "sm120_median": 0.004824756063997836,
+        "improvement_percent": 0.1286350900576938
+      }
+    },
+    {
+      "requests": 1,
+      "input_len": 256,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 15657.793695511637,
+        "sm120_median": 15963.313032772727,
+        "improvement_percent": 1.9512285268432628
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 212.93659942187134,
+        "sm120_median": 217.84977882767691,
+        "improvement_percent": 2.307343791130778
+      },
+      "output_tokens_per_second": {
+        "torch_median": 197.77658703818378,
+        "sm120_median": 201.18619632584142,
+        "improvement_percent": 1.7239701315097333
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.016367023010388948,
+        "sm120_median": 0.016041551003581844,
+        "improvement_percent": 1.9885840363303098
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.004697004096083073,
+        "sm120_median": 0.0045903192076366395,
+        "improvement_percent": 2.271339054939303
+      }
+    },
+    {
+      "requests": 4,
+      "input_len": 256,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 30710.526915550297,
+        "sm120_median": 30896.005992239356,
+        "improvement_percent": 0.6039592781950542
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 807.637315194374,
+        "sm120_median": 809.8981133110135,
+        "improvement_percent": 0.2799273973733474
+      },
+      "output_tokens_per_second": {
+        "torch_median": 683.7393964865571,
+        "sm120_median": 685.7085244718088,
+        "improvement_percent": 0.28799393385405825
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.033344426497933455,
+        "sm120_median": 0.03314579449943267,
+        "improvement_percent": 0.5956977503064786
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.004952719772606337,
+        "sm120_median": 0.00493895033873888,
+        "improvement_percent": 0.2780176246517385
+      }
+    },
+    {
+      "requests": 8,
+      "input_len": 256,
+      "output_len": 32,
+      "prefill_tokens_per_second": {
+        "torch_median": 33607.90257462145,
+        "sm120_median": 33664.21090269444,
+        "improvement_percent": 0.16754490390458177
+      },
+      "decode_tokens_per_second": {
+        "torch_median": 1492.531703967631,
+        "sm120_median": 1492.1213584110583,
+        "improvement_percent": -0.027493255619426282
+      },
+      "output_tokens_per_second": {
+        "torch_median": 1125.0881138768543,
+        "sm120_median": 1125.2858057930148,
+        "improvement_percent": 0.017571238529856537
+      },
+      "batch_ttft_seconds": {
+        "torch_median": 0.0609391785110347,
+        "sm120_median": 0.06083652548841201,
+        "improvement_percent": 0.16845160228752265
+      },
+      "mean_tpot_seconds": {
+        "torch_median": 0.005360165516556721,
+        "sm120_median": 0.005361506287778367,
+        "improvement_percent": -0.025013616044211595
+      }
+    }
+  ]
+}
