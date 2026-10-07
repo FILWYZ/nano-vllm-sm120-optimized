@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "device": "RTX 5060",
+  "sampling": "nvidia-smi power.draw at 200 ms intervals",
+  "sample_count": 230,
+  "sample_interval_s": 0.2,
+  "estimated_sampled_duration_s": 46.0,
+  "board_power_w": {
+    "mean": 38.985521739130434,
+    "median": 31.515,
+    "min": 11.75,
+    "max": 83.71
+  },
+  "benchmark": {
+    "independent_process_runs": 5,
+    "matrix_workloads": 6,
+    "generated_output_tokens_including_warmups": 4160,
+    "estimated_board_energy_j": 1793.3339999999998,
+    "gross_tokens_per_joule": 2.3197017398878295,
+    "gross_joules_per_output_token": 0.4310899038461538,
+    "measurement_scope": "whole sampled process window, includes process/model startup, warmups and board idle; no idle-power subtraction"
+  },
+  "raw_samples_file": "power_samples_w.csv",
+  "matrix_summary_file": "matrix/summary.json"
+}

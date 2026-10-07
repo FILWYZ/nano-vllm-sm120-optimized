@@ -53,6 +53,13 @@
 
 mixed 的 p95 高于 prefill-first，因为每轮 Prefill chunk 会形成较稳定的间隔；prefill-first 多数 token 间隔较低，但偶发长停顿约 81 ms。交互服务保留 mixed，可避免这类长停顿。原始结果在同目录 online_latency/。
 
+### 功耗与连续请求稳定性
+
+- RTX 5060 功耗采样间隔 200 ms，共 230 个样本、约 46 s；平均 38.99 W，中位数 31.52 W，范围 11.75–83.71 W。
+- 同一窗口执行 5 次独立进程、六组负载，计入预热共生成 4,160 个 token；按整卡窗口功耗估算约 1,793.3 J，约 2.32 token/J（0.431 J/token）。该估计包含模型/进程启动、预热和空闲功耗，没有扣除空闲基线，适合做整次运行的保守参考，不代表纯 decode 能效。原始样本和计算结果在 power_efficiency/。
+- 本机 API 连续负载 40 个 Chat Completions、4 路并发、每个请求 10 tokens：40/40 成功，400 个输出 token，1.62 s，24.6 请求/s；请求延迟 P50 75 ms、P95 939 ms。结束后 health 仍为 ok，queue_depth 和 active_requests 均为 0；PyTorch allocated 从 3.836 到 3.852 GiB。
+- 这次是短时并发 soak，不等同于数小时耐久测试；长时间运行仍需在目标部署时补测。原始数据见 service_soak.json。
+
 ## 验证
 
 - 完整回归：45 passed，5 subtests passed；FlashInfer 使用隔离 JIT 缓存。
@@ -63,5 +70,5 @@ mixed 的 p95 高于 prefill-first，因为每轮 Prefill chunk 会形成较稳�
 ## 有意保留的后续项
 
 - **INT4 权重量化未接入。** 当前 Qwen3 使用自定义 LinearBase/F.linear 和分片权重加载；torchao 文档列出的稳定 INT4 weight-only 流程主要面向 torch.nn.Linear。当前本机也没有适配后的量化模型或内核 A/B 结果。直接包装或反复反量化可能牺牲速度/数值质量，因此不把未经验证的 INT4 列为已交付。等目标扩大到更大模型时，应实现专用 LinearBase 量化加载路径，再测显存、速度和输出质量。[torchao 推理量化文档](https://docs.pytorch.org/ao/stable/workflows/inference.html)
-- 未采集持续功耗，因此没有报告 tok/s/W；也没有做数小时级 soak test。当前验收包含多进程基准、双请求服务并发、断连回收和显存失败路径测试。
+- INT4 权重量化作为有意 no-go 保留；数小时级 soak test 仍未做。已完成 40 请求/4 并发的短时服务稳定性检查，以及整卡窗口功耗/能效估算。
 - LoRA、推测解码、多卡和多租户仍不在此单卡端侧版本范围。
