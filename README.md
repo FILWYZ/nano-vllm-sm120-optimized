@@ -148,7 +148,7 @@ Qwen3-0.6B BF16、五个独立进程、A/B 交替顺序的最终结果：
 
 ## 工程验证
 
-- nano-vLLM 原有回归：`41 passed`，另有 `5 subtests passed`；本次新增取消回收用例后为 `43 passed`。
+- nano-vLLM 在 2026-10-10 最终证据提交上全量复跑：`45 passed`，另有 `5 subtests passed`；测试环境和精确提交见 [最终验证记录](docs/FINAL_VALIDATION_20261010.md)。
 - CUDA 算子仓库：`180 passed`。
 - Compute Sanitizer：memcheck `0 errors`，racecheck `0 hazards`。
 - 自定义算子通过 `torch.compile(fullgraph=True)`、CUDA Graph capture/replay。
