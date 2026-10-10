@@ -10,8 +10,24 @@ CUDA 算子融合完成端到端适配与优化。
 按负载保守调度**。
 
 > 项目定位：用于学习和验证 LLM 推理系统核心机制，不等价于生产级
-> vLLM。文中的 7.66× 是相对本项目复现的上游 SM120 SDPA 兼容基线，
-> 不是相对官方 `vllm-project/vllm` 的性能结论。
+> vLLM。官方 vLLM 固定形状对照显示本项目与 vLLM 吞吐接近；自定义
+> Kernel 的启用范围依据真实推理 A/B 保持保守。
+
+## 最新性能基线
+
+同机固定负载对照显示 nano-vLLM 与官方 vLLM 0.31.0 整体接近。Qwen3-0.6B
+六组 workload 的吞吐几何平均比 `vLLM / nano = 0.967×`；Qwen3-1.7B 五轮
+交错三引擎复测的 `nano / vLLM = 0.996×`。这些是模型、输入输出长度和并发
+固定后的**引擎级结果**，不说明任何单个 kernel 的因果收益；PyTorch 版本、
+Attention 和 KV 实现仍有差异。
+
+| 模型 | 负载 | nano / vLLM 或 vLLM / nano | 结论 |
+|---|---|---:|---|
+| Qwen3-0.6B BF16 | batch 1/4/8，prompt 64/256，output 32 | vLLM / nano = 0.967× | 固定矩阵整体接近 |
+| Qwen3-1.7B BF16 | 同形状，五轮交错独立进程 | nano / vLLM = 0.996× | 五轮中位吞吐几何平均接近 |
+
+复现实验设置、硬件/软件栈差异、Nsight Systems 时间线和结果解释见
+[`FINAL_EVIDENCE_AUDIT_20261010.md`](docs/optimizations/FINAL_EVIDENCE_AUDIT_20261010.md)。
 
 ## 核心成果
 
@@ -20,10 +36,13 @@ CUDA 算子融合完成端到端适配与优化。
 | SM120 适配 | SDPA 兼容基线、FlashInfer Paged Attention | Qwen3-0.6B 可在 SM120 离线运行 |
 | 执行路径 | 无 Host 同步 KV Append、分桶 CUDA Graph、采样 Fast Path | 固定矩阵相对兼容基线几何平均加速 8.23× |
 | KV Cache 与调度 | 16-token Page、Prefix Cache、Mixed Continuous Batching、输出感知 KV Admission | 256 请求长负载无抢占、无重复 Prefill |
-| RMSNorm | 接入独立 SM120 fused residual-add RMSNorm | 6 组 E2E 输出吞吐变化 +0.04%～+3.75% |
+| RMSNorm | 接入独立 SM120 fused residual-add RMSNorm | 已完成真实引擎消融；端到端变化较小，未证明稳定的单算子吞吐收益 |
 | Q/K 热路径融合 | Q/K RMSNorm + RoPE + Paged KV Store 单 kernel | batch=1 Decode +1.77% / +2.31% |
 
-## 端到端结果
+## 既有 256 请求长负载结果
+
+这是与**项目内复现的上游 SM120 SDPA 兼容基线**对照的独立长负载实验，
+不是上面的官方 vLLM 对照，也不能将总收益归因给单个 kernel。
 
 长负载条件：Qwen3-0.6B FP16、RTX 5060 Laptop SM120、256 个请求、输入和
 输出长度随机分布于 100–1024、`seed=0`、三轮独立进程。
