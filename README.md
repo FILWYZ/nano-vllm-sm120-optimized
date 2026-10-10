@@ -137,6 +137,12 @@ Qwen3-0.6B BF16、五个独立进程、A/B 交替顺序的最终结果：
   seed、交替顺序和中位数汇总。
 - 原始大型 NCU/Trace 文件不提交，仓库保留汇总 JSON、复现脚本和指标边界。
 
+### 固定负载对照与系统级分析
+
+- 在记录的 Qwen3-0.6B BF16 六组固定负载上，nano-vLLM 相对官方 vLLM 的吞吐几何平均为 **1.034×**；Qwen3-1.7B 固定矩阵中 nano/vLLM 为 **0.996×**，TensorRT-LLM/nano 为 **1.060×**。这些是特定提交和软件栈下的引擎级比较，PyTorch、Attention 和 KV 管理实现存在差异，不代表 kernel 等价或普遍性能结论。
+- 一次代表性 Nsight Systems 采样中，batch=8 的主要 BF16 GEMM 约占 GPU kernel 总时长 **83.6%**；cudaGraphLaunch API 中位时长 **73.5 μs**。API 时间可能与 GPU 工作重叠，不能直接相加为端到端耗时。
+- 测试条件、版本差异、形状边界和时间线复跑命令见[最终性能证据审计](docs/optimizations/FINAL_EVIDENCE_AUDIT_20261010.md)；时间线采集脚本位于[profile_system_timeline.py](benchmarks/e2e/profile_system_timeline.py)。
+
 ## 快速复现
 
 ```bash
