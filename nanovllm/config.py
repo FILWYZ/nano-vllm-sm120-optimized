@@ -10,6 +10,7 @@ class Config:
     max_num_seqs: int = 512
     max_model_len: int = 4096
     gpu_memory_utilization: float = 0.9
+    gpu_memory_reserve_gib: float = 0.0
     tensor_parallel_size: int = 1
     enforce_eager: bool = False
     attention_backend: str = "auto"
@@ -31,6 +32,10 @@ class Config:
         if self.attention_backend == "flash":
             assert self.kvcache_block_size == 256
         assert 1 <= self.tensor_parallel_size <= 8
+        if not 0.1 <= self.gpu_memory_utilization < 1.0:
+            raise ValueError("gpu_memory_utilization must be in [0.1, 1.0)")
+        if self.gpu_memory_reserve_gib < 0:
+            raise ValueError("gpu_memory_reserve_gib cannot be negative")
         assert self.attention_backend in {"auto", "flash", "flashinfer", "sdpa"}
         assert self.rmsnorm_backend in {"auto", "torch", "sm120"}
         assert self.qk_norm_rope_backend in {"auto", "torch", "sm120"}

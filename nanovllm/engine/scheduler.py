@@ -35,6 +35,19 @@ class Scheduler:
     def add(self, seq: Sequence):
         self.waiting.append(seq)
 
+    def cancel(self, seq: Sequence) -> bool:
+        """Remove a pending/running sequence and release its KV blocks."""
+        if seq.status in {SequenceStatus.FINISHED, SequenceStatus.CANCELLED}:
+            return False
+        if seq in self.waiting:
+            self.waiting.remove(seq)
+        if seq in self.running:
+            self.running.remove(seq)
+        if seq.block_table:
+            self.block_manager.deallocate(seq)
+        seq.status = SequenceStatus.CANCELLED
+        return True
+
     def _schedule_decode(self, scheduled_seqs):
         decode_tokens = 0
         candidates = len(self.running)

@@ -5,6 +5,7 @@ from typing import Any
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
 import torch.multiprocessing as mp
+import torch.distributed as dist
 
 from nanovllm.config import Config
 from nanovllm.sampling_params import SamplingParams
@@ -29,7 +30,16 @@ class LLMEngine:
             process.start()
             self.ps.append(process)
             self.events.append(event)
-        self.model_runner = ModelRunner(config, 0, self.events)
+        try:
+            self.model_runner = ModelRunner(config, 0, self.events)
+        except Exception:
+            for process in self.ps:
+                if process.is_alive():
+                    process.terminate()
+                process.join(timeout=5)
+            if dist.is_initialized():
+                dist.destroy_process_group()
+            raise
         self.tokenizer = AutoTokenizer.from_pretrained(config.model, use_fast=True)
         config.eos = self.tokenizer.eos_token_id
         self.scheduler = Scheduler(config)
