@@ -10,8 +10,21 @@ def default_weight_loader(param: nn.Parameter, loaded_weight: torch.Tensor):
 
 
 def load_model(model: nn.Module, path: str):
+    weight_files = sorted(glob(os.path.join(path, "*.safetensors")))
+    if not weight_files:
+        incomplete_files = glob(os.path.join(path, "**", "*.incomplete"), recursive=True, include_hidden=True)
+        detail = (
+            f" Found incomplete download artifact(s): {incomplete_files[:3]}."
+            if incomplete_files else ""
+        )
+        raise FileNotFoundError(
+            f"No .safetensors model weights found in {path}."
+            " Refusing to run with randomly initialized model parameters."
+            + detail
+        )
+
     packed_modules_mapping = getattr(model, "packed_modules_mapping", {})
-    for file in glob(os.path.join(path, "*.safetensors")):
+    for file in weight_files:
         with safe_open(file, "pt", "cpu") as f:
             for weight_name in f.keys():
                 for k in packed_modules_mapping:

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-20T07:30:54.696483+00:00",
+  "variant": "sm120-compat-baseline",
+  "suite": "github",
+  "git_commit": "7aa1f251cf1e041ded3371bab41f90e6736111ac",
+  "working_directory": "/home/asus/nano-compat-baseline",
+  "environment": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.14.1+cu130",
+    "torch_cuda": "13.0",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375
+  },
+  "config": {
+    "model": "/home/asus/models/Qwen3-0.6B-verified",
+    "model_dtype": "torch.bfloat16",
+    "seed": 0,
+    "temperature": 0.6,
+    "max_model_len": 4096,
+    "max_num_seqs": 256,
+    "max_num_batched_tokens": 16384,
+    "gpu_memory_utilization": 0.75,
+    "kvcache_block_size": 256,
+    "rmsnorm_backend": "torch",
+    "qk_norm_rope_backend": "torch",
+    "attention_backend": "sdpa",
+    "enforce_eager_resolved": true
+  },
+  "workload": {
+    "requests": 256,
+    "input_tokens": 142827,
+    "expected_output_tokens": 133966,
+    "actual_output_tokens": 133966
+  },
+  "result": {
+    "init_seconds": 4.912920216971543,
+    "elapsed_seconds": 613.5225538120139,
+    "output_tokens_per_second": 218.3554608834279,
+    "peak_allocated_gib": 4.75862979888916,
+    "peak_reserved_gib": 4.94140625,
+    "output_sha256": "945d1c37cf72bcf6384276871c3ae2322585860a040a3f29845fff7eeee8cdde"
+  },
+  "engine_metrics": {}
+}

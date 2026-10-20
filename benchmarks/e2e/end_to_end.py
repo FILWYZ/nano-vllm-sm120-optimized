@@ -29,6 +29,7 @@ def parse_args():
                         choices=["auto", "torch", "sm120"])
     parser.add_argument("--max-model-len", type=int, default=512)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.75)
+    parser.add_argument("--gpu-memory-reserve-gib", type=float, default=0.0)
     parser.add_argument("--block-size", type=int, default=16)
     parser.add_argument("--warmup-repeats", type=int, default=1)
     parser.add_argument("--repeats", type=int, default=2)
@@ -57,6 +58,7 @@ def main():
         max_num_batched_tokens=max(2048, args.max_model_len * max_requests),
         max_num_seqs=max_requests,
         gpu_memory_utilization=args.gpu_memory_utilization,
+        gpu_memory_reserve_gib=args.gpu_memory_reserve_gib,
         kvcache_block_size=args.block_size,
     )
     results = []
@@ -116,6 +118,7 @@ def main():
             ),
             "max_model_len": args.max_model_len,
             "gpu_memory_utilization": args.gpu_memory_utilization,
+            "gpu_memory_reserve_gib": args.gpu_memory_reserve_gib,
             "warmup_repeats": args.warmup_repeats,
             "repeats": args.repeats,
             "enforce_eager": args.enforce_eager,

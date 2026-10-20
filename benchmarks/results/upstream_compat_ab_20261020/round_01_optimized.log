@@ -1,0 +1,9 @@
+{
+  "init_seconds": 5.5134691260172985,
+  "elapsed_seconds": 76.55758050299482,
+  "output_tokens_per_second": 1749.872437449345,
+  "peak_allocated_gib": 5.08959436416626,
+  "peak_reserved_gib": 5.13671875,
+  "output_sha256": "61639a008755e3779b24e8fe5fe3e5e00967c8c334aefbbe210477350f503c8d"
+}
+wrote=/mnt/d/CUDA/repositories/nano-vllm-sm120-optimized/benchmarks/results/upstream_compat_ab_20261020/round_01_optimized.json

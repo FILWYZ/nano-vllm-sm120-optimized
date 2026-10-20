@@ -40,15 +40,17 @@ class ModelRunner:
         default_dtype = torch.get_default_dtype()
         torch.set_default_dtype(hf_config.dtype)
         torch.set_default_device("cuda")
-        self.model = Qwen3ForCausalLM(hf_config)
-        load_model(self.model, config.model)
-        self.sampler = Sampler()
-        self.warmup_model()
-        self.allocate_kv_cache()
-        if not self.enforce_eager:
-            self.capture_cudagraph()
-        torch.set_default_device("cpu")
-        torch.set_default_dtype(default_dtype)
+        try:
+            self.model = Qwen3ForCausalLM(hf_config)
+            load_model(self.model, config.model)
+            self.sampler = Sampler()
+            self.warmup_model()
+            self.allocate_kv_cache()
+            if not self.enforce_eager:
+                self.capture_cudagraph()
+        finally:
+            torch.set_default_device("cpu")
+            torch.set_default_dtype(default_dtype)
 
         if self.world_size > 1:
             if rank == 0:
@@ -122,14 +124,30 @@ class ModelRunner:
         num_kv_heads = hf_config.num_key_value_heads // self.world_size
         head_dim = getattr(hf_config, "head_dim", hf_config.hidden_size // hf_config.num_attention_heads)
         block_bytes = 2 * hf_config.num_hidden_layers * self.block_size * num_kv_heads * head_dim * hf_config.dtype.itemsize
-        available_blocks = int(
+        reserve_bytes = int(config.gpu_memory_reserve_gib * 2**30)
+        available_bytes = int(
             total * config.gpu_memory_utilization - used - peak + current
-        ) // block_bytes
+            - reserve_bytes
+        )
+        available_blocks = available_bytes // block_bytes
         config.num_kvcache_blocks = (
             min(config.num_kvcache_blocks, available_blocks)
             if config.num_kvcache_blocks > 0 else available_blocks
         )
-        assert config.num_kvcache_blocks > 0
+        minimum_blocks = (
+            config.max_model_len + self.block_size - 1
+        ) // self.block_size
+        if config.num_kvcache_blocks < minimum_blocks:
+            free_gib = free / 2**30
+            raise RuntimeError(
+                "Insufficient GPU memory for the requested KV cache: "
+                f"available_blocks={config.num_kvcache_blocks}, "
+                f"minimum_for_one_max_length_request={minimum_blocks}, "
+                f"free={free_gib:.2f} GiB/{total / 2**30:.2f} GiB, "
+                f"gpu_memory_utilization={config.gpu_memory_utilization:.2f}, "
+                f"gpu_memory_reserve_gib={config.gpu_memory_reserve_gib:.2f}. "
+                "Reduce max_model_len/max_num_seqs or close other GPU applications."
+            )
         self.kv_cache = torch.empty(2, hf_config.num_hidden_layers, config.num_kvcache_blocks, self.block_size, num_kv_heads, head_dim)
         layer_id = 0
         for module in self.model.modules():

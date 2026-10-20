@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "timestamp_utc": "2026-10-07T08:36:03.960073+00:00",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.11.0+cu128",
+    "torch_cuda": "12.8",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375,
+    "git_commit": "6befefaed848e88173e66acd04c2eefa6a1ddcd8"
+  },
+  "policy": "mixed",
+  "workload": {
+    "short_prompt_tokens": 64,
+    "short_output_tokens": 24,
+    "long_prompt_tokens": 512,
+    "long_output_tokens": 1,
+    "arrival_after_short_output_tokens": 4,
+    "prefill_chunk_size": 128
+  },
+  "short_decode": {
+    "observed_gaps": 20,
+    "mean_inter_token_gap_seconds": 0.007621178100816905,
+    "p95_inter_token_gap_seconds": 0.01942847401369363,
+    "max_inter_token_gap_seconds": 0.019805183983407915
+  },
+  "steps_after_arrival": {
+    "count": 20,
+    "mean_seconds": 0.0076130867993924765,
+    "p95_seconds": 0.019426324986852705
+  },
+  "long_request_finished": true,
+  "long_completion_tokens": 1,
+  "scheduler": {
+    "prefill_chunks": 5,
+    "mixed_batches": 4,
+    "prefill_only_batches": 1,
+    "decode_only_batches": 19,
+    "preemptions": 0
+  }
+}

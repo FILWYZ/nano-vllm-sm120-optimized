@@ -1,0 +1,10 @@
+Using PyTorch SDPA attention; CUDA graph capture is disabled.
+{
+  "init_seconds": 4.912920216971543,
+  "elapsed_seconds": 613.5225538120139,
+  "output_tokens_per_second": 218.3554608834279,
+  "peak_allocated_gib": 4.75862979888916,
+  "peak_reserved_gib": 4.94140625,
+  "output_sha256": "945d1c37cf72bcf6384276871c3ae2322585860a040a3f29845fff7eeee8cdde"
+}
+wrote=/mnt/d/CUDA/repositories/nano-vllm-sm120-optimized/benchmarks/results/upstream_compat_ab_20261020/round_01_compat.json

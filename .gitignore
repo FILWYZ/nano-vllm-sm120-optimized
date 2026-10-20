@@ -201,3 +201,25 @@ benchmarks/results/*
 !benchmarks/results/rmsnorm_ab_summary.json
 !benchmarks/results/qk_norm_rope_final_dispatch_ab_summary.json
 .cursorindexingignore
+
+# Tracked local edge baseline artifacts
+!benchmarks/results/edge_baseline_20261007/
+!benchmarks/results/edge_baseline_20261007/BASELINE_REPORT.md
+!benchmarks/results/edge_baseline_20261007/OPTIMIZATION_PLAN.md
+!benchmarks/results/edge_baseline_20261007/current_engine_baseline.json
+
+# Reproducible local edge acceptance artifacts
+!benchmarks/results/edge_acceptance_20261007/
+!benchmarks/results/edge_acceptance_20261007/**
+
+# Current same-device compatibility A/B and sustained edge soak evidence.
+!benchmarks/results/upstream_compat_ab_20261020/
+!benchmarks/results/upstream_compat_ab_20261020/**
+!benchmarks/results/edge_soak_20261020/
+!benchmarks/results/edge_soak_20261020/**
+!benchmarks/results/current_engine_ab_20261020_formal/
+!benchmarks/results/current_engine_ab_20261020_formal/*.json
+!benchmarks/results/current_vs_vllm032_20261020/
+!benchmarks/results/current_vs_vllm032_20261020/*.json
+!benchmarks/results/current_engine_comparison_20261020/
+!benchmarks/results/current_engine_comparison_20261020/summary.json
