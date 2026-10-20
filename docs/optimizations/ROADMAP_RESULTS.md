@@ -1,5 +1,7 @@
 # nano-vLLM｜SM120 离线推理优化路线与结果
 
+> **历史里程碑报告**：本文早期测试使用 PyTorch 2.11.0+cu128、CUDA 12.8、Triton 3.6，包含 23 项测试。本文保留当时的实验数据；最终主线环境及后续 47 项回归结果见 [`ENVIRONMENT.md`](../ENVIRONMENT.md) 和 [`VALIDATION_20261020.md`](../VALIDATION_20261020.md)。不同提交与软件环境的数据不可视作同一次测试。
+
 ## 1. 项目定位与结论边界
 
 本项目是基于 GeeeekExplorer/nano-vLLM 的离线、教学型推理引擎优化分支，目标是在 RTX 5060 Laptop（Blackwell SM120）上建立可运行、可解释、可复现的 LLM 推理路径。
@@ -8,11 +10,11 @@
 
 - GPU：NVIDIA GeForce RTX 5060 Laptop，Compute Capability 12.0，8 GiB
 - OS/Runtime：WSL2、Python 3.12、PyTorch 2.11.0+cu128、Triton 3.6、FlashInfer 0.6.6
-- Model：Qwen3-0.6B FP16
+- Model：Qwen3-0.6B BF16
 
 性能结论只适用于上述硬件、软件、模型和负载。
 
-本文的 7.66× 加速是相对 GitHub 上游 commit `bb823b3` 派生的 **SM120 最小可运行 SDPA 兼容基线**，不是相对官方 `vllm-project/vllm`，也不是相对上游在 RTX 4070 原生 FlashAttention 环境的结论。
+本文中的 7.66× 结果来自 GitHub 上游 commit `bb823b3` 派生的 **SM120 最小可运行 SDPA 兼容基线**与优化版对照。原版上游、兼容基线和优化版的区别及复测边界见 README 的“比较对象与可比范围”。该数字不是官方 vLLM 对照，也不是上游在 RTX 4070 原生 FlashAttention 环境的公开成绩。
 
 ## 2. 可复现版本索引
 
@@ -35,7 +37,7 @@
 
 ## 3. M8 最终 A/B 结果
 
-测试负载复现原仓库 README：
+测试负载复现原仓库 README，模型权重按本地 safetensors/config 检查为 BF16：
 
 - 256 个请求
 - 142,827 个输入 Token
@@ -162,7 +164,7 @@ python -m benchmarks.e2e.end_to_end \
 
 ## 8. 局限与下一步
 
-- 当前只验证 Qwen3-0.6B FP16、单卡 8 GiB RTX 5060 Laptop 和离线长负载。
+- 当前端到端主要覆盖 Qwen3-0.6B BF16、单卡 8 GiB RTX 5060 Laptop 和离线长负载。
 - WSL 驱动路径未启用 CUPTI CUDA Activity；Profiler 结论以 CUDA Event 和同步后的端到端计时为准。
 - FlashInfer 规划阶段仍有少量主机/设备元数据复制，Prompt KV 也尚未实现按 Chunk 的惰性分配。
 - 尚未覆盖 FP8 KV、投机解码、张量并行、top-k/top-p 和多模型评估。

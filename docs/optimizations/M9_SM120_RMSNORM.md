@@ -23,7 +23,7 @@ Attention、KV Cache 或 Scheduler，只替换存在 residual 的 RMSNorm 热路
 ## A/B 协议
 
 - GPU：NVIDIA GeForce RTX 5060 Laptop，SM120；
-- 模型：Qwen3-0.6B FP16；
+- 模型：Qwen3-0.6B BF16（本地配置与 safetensors 权重 dtype）；
 - Attention：FlashInfer；KV Page：16；CUDA Graph 开启；
 - 形状：请求数 1/4/8，输入长度 64/256，输出长度固定 32；
 - 每个后端 3 个独立 Python 进程，每个形状 1 次 warmup、2 次测量；

@@ -96,3 +96,17 @@ python -m benchmarks.summarize_qk_norm_rope_ab \
 公开结论只适用于上述硬件、模型、软件环境和负载。该结果不表示自定义 CUDA
 在所有 Shape 上都优于 Inductor，也不能作为相对官方 vLLM、其他 GPU 或其他
 模型的通用性能结论。
+
+## 后续 RTX 5060 dispatch 复测（2026-10-07，归档于 2026-10-10）
+
+在 PyTorch 2.14.1+cu130、CUDA Runtime 13.0、NVCC 13.3 的 nano-vLLM
+环境下，进一步做五轮交错独立进程 A/B，覆盖 batch 1/8/16/32/64 和三组
+Prompt/Decode 长度。batch=1 在 prompt/decode 256/16 与 64/64 上的输出吞吐
+中位变化分别为 +2.77% 和 +2.78%；batch 8–64 的差异约 −0.41% 到 +1.36%，
+会随形状变号，不能视为稳定收益。生产 dispatch 继续限制为 batch=1 Decode，
+不扩大到 Prefill 或多 batch。
+
+完整形状矩阵、RMSNorm 微基准和 NCU 资源计数器见项目审计
+[`FINAL_EVIDENCE_AUDIT_20261010.md`](FINAL_EVIDENCE_AUDIT_20261010.md) 与
+关联 CUDA 仓库的 `docs/RTX5060_SHAPE_MAP_20261010.md`。上文 PyTorch
+2.11.0+cu128 的数字保留为历史测量，不与后续运行时结果混合。

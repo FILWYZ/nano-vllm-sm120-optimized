@@ -28,8 +28,13 @@ def parse_args():
     parser.add_argument("--output-len", type=int, default=32)
     parser.add_argument("--temperature", type=float, default=0.6)
     parser.add_argument("--max-model-len", type=int)
+    parser.add_argument("--max-num-seqs", type=int)
+    parser.add_argument("--max-num-batched-tokens", type=int)
     parser.add_argument("--gpu-memory-utilization", type=float)
     parser.add_argument("--block-size", type=int)
+    parser.add_argument("--attention-backend", choices=["auto", "flash", "flashinfer", "sdpa"])
+    parser.add_argument("--rmsnorm-backend", choices=["auto", "torch", "sm120"])
+    parser.add_argument("--qk-norm-rope-backend", choices=["auto", "torch", "sm120"])
     parser.add_argument("--disable-mixed-batching", action="store_true")
     parser.add_argument("--reserve-output-kv", action="store_true")
     return parser.parse_args()
@@ -99,6 +104,16 @@ def main():
         "enforce_eager": False,
         "max_model_len": args.max_model_len or default_max_len,
     }
+    for name in (
+        "max_num_seqs",
+        "max_num_batched_tokens",
+        "attention_backend",
+        "rmsnorm_backend",
+        "qk_norm_rope_backend",
+    ):
+        value = getattr(args, name)
+        if value is not None:
+            kwargs[name] = value
     if args.gpu_memory_utilization is not None:
         kwargs["gpu_memory_utilization"] = args.gpu_memory_utilization
     if args.block_size is not None:
@@ -147,15 +162,20 @@ def main():
             },
             "config": {
                 "model": args.model,
+                "model_dtype": str(llm.model_runner.config.hf_config.dtype),
                 "seed": args.seed,
                 "temperature": args.temperature if args.suite == "fixed" else 0.6,
                 "max_model_len": kwargs["max_model_len"],
+                "max_num_seqs": getattr(llm.model_runner.config, "max_num_seqs", None),
+                "max_num_batched_tokens": getattr(llm.model_runner.config, "max_num_batched_tokens", None),
                 "gpu_memory_utilization": getattr(
                     llm.model_runner.config, "gpu_memory_utilization", None
                 ),
                 "kvcache_block_size": getattr(
                     llm.model_runner.config, "kvcache_block_size", None
                 ),
+                "rmsnorm_backend": getattr(llm.model_runner.config, "rmsnorm_backend", "torch"),
+                "qk_norm_rope_backend": getattr(llm.model_runner.config, "qk_norm_rope_backend", "torch"),
                 "attention_backend": getattr(
                     llm.model_runner.config, "attention_backend", "upstream-flash"
                 ),
