@@ -217,3 +217,9 @@ benchmarks/results/*
 !benchmarks/results/upstream_compat_ab_20261020/**
 !benchmarks/results/edge_soak_20261020/
 !benchmarks/results/edge_soak_20261020/**
+!benchmarks/results/current_engine_ab_20261020_formal/
+!benchmarks/results/current_engine_ab_20261020_formal/*.json
+!benchmarks/results/current_vs_vllm032_20261020/
+!benchmarks/results/current_vs_vllm032_20261020/*.json
+!benchmarks/results/current_engine_comparison_20261020/
+!benchmarks/results/current_engine_comparison_20261020/summary.json

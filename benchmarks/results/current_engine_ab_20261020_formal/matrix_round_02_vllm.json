@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-20T17:47:31.750331+08:00",
+  "engine": "vllm",
+  "repo": null,
+  "git_commit": null,
+  "status": "passed",
+  "results": {
+    "n4_p64_o32": {
+      "status": "passed",
+      "requests": 4,
+      "input_tokens_per_request": 64,
+      "output_tokens_per_request": 32,
+      "output_tokens": 128,
+      "elapsed_seconds": 0.1755048029590398,
+      "requests_per_second": 22.791399053241523,
+      "output_tokens_per_second": 729.3247697037287,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.4453125,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.4453125
+      },
+      "output_sha256": "9782a0d9c84decb526567cbc376469434c4c1baa317c4b98fae99e2b9da55114"
+    },
+    "n8_p64_o32": {
+      "status": "passed",
+      "requests": 8,
+      "input_tokens_per_request": 64,
+      "output_tokens_per_request": 32,
+      "output_tokens": 256,
+      "elapsed_seconds": 0.18484132003504783,
+      "requests_per_second": 43.28036609175436,
+      "output_tokens_per_second": 1384.9717149361395,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.435546875,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.435546875
+      },
+      "output_sha256": "08339f93ad19fcd45689ef002d00de708400d053278c35f00b38cb3637ab22d0"
+    },
+    "n1_p256_o32": {
+      "status": "passed",
+      "requests": 1,
+      "input_tokens_per_request": 256,
+      "output_tokens_per_request": 32,
+      "output_tokens": 32,
+      "elapsed_seconds": 0.15518446400528774,
+      "requests_per_second": 6.4439440275795015,
+      "output_tokens_per_second": 206.20620888254405,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.435546875,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.435546875
+      },
+      "output_sha256": "1467742b519c31934060f5ec673bb660cfa24322a5086f80bce5be52a0a7215a"
+    },
+    "n4_p256_o32": {
+      "status": "passed",
+      "requests": 4,
+      "input_tokens_per_request": 256,
+      "output_tokens_per_request": 32,
+      "output_tokens": 128,
+      "elapsed_seconds": 0.2025893779937178,
+      "requests_per_second": 19.744371790923996,
+      "output_tokens_per_second": 631.8198973095679,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.455078125,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.455078125
+      },
+      "output_sha256": "61be324343c517ed1e78cf925635079326d3f5c36db883cfec7e19b9c4dbfc09"
+    },
+    "n8_p256_o32": {
+      "status": "passed",
+      "requests": 8,
+      "input_tokens_per_request": 256,
+      "output_tokens_per_request": 32,
+      "output_tokens": 256,
+      "elapsed_seconds": 0.24035599798662588,
+      "requests_per_second": 33.283962401658655,
+      "output_tokens_per_second": 1065.086796853077,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.52734375,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.52734375
+      },
+      "output_sha256": "4658d78580e0f43d3eade99cc3bee2f373006ebb9f3497a7c0fb43e8e76273f8"
+    },
+    "n1_p64_o32": {
+      "status": "passed",
+      "requests": 1,
+      "input_tokens_per_request": 64,
+      "output_tokens_per_request": 32,
+      "output_tokens": 32,
+      "elapsed_seconds": 0.15148584498092532,
+      "requests_per_second": 6.6012768396012,
+      "output_tokens_per_second": 211.2408588672384,
+      "request_latency_seconds": {
+        "count": 0,
+        "p50": null,
+        "p95": null,
+        "definition": "arrival to completion within one offline batch; vLLM exposes batch latency when per-request timestamps are unavailable"
+      },
+      "memory_gib": {
+        "gpu_total_used_baseline": 7.52734375,
+        "gpu_total_used_delta": 0.0,
+        "pytorch_peak_allocated": 0.0,
+        "pytorch_peak_reserved": 0.0,
+        "gpu_total_used_max_sample": 7.52734375
+      },
+      "output_sha256": "3613a8cc36d471ac1dc7dbd4ea81a9c62211722506476025f69d838c41ec52f4"
+    }
+  },
+  "environment": {
+    "python": "3.12.3",
+    "torch": "2.13.0+cu130",
+    "torch_cuda": "13.0",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375
+  },
+  "init_seconds": 22.241389759001322,
+  "config": {
+    "max_model_len": 512,
+    "max_num_seqs": 8,
+    "max_num_batched_tokens": 2048,
+    "gpu_memory_utilization": 0.7,
+    "dtype": "bfloat16",
+    "seed": 20261020,
+    "enforce_eager": false,
+    "enable_prefix_caching": false,
+    "disable_log_stats": true
+  },
+  "vllm_version": "0.31.0",
+  "gpu_memory_sampling": "nvidia-smi snapshots immediately before and after each measured batch; transient peaks may be missed"
+}
