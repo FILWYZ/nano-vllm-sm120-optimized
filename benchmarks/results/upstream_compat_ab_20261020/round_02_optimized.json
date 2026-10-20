@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-20T07:33:49.406292+00:00",
+  "variant": "optimized-m8",
+  "suite": "github",
+  "git_commit": "11d0aa58a2c68d7132dd0d919e1029afea6a6aa2",
+  "working_directory": "/mnt/d/CUDA/repositories/nano-vllm-sm120-optimized",
+  "environment": {
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "torch": "2.14.1+cu130",
+    "torch_cuda": "13.0",
+    "device": "NVIDIA GeForce RTX 5060",
+    "compute_capability": [
+      12,
+      0
+    ],
+    "total_memory_gib": 7.95941162109375
+  },
+  "config": {
+    "model": "/home/asus/models/Qwen3-0.6B-verified",
+    "model_dtype": "torch.bfloat16",
+    "seed": 0,
+    "temperature": 0.6,
+    "max_model_len": 4096,
+    "max_num_seqs": 256,
+    "max_num_batched_tokens": 16384,
+    "gpu_memory_utilization": 0.75,
+    "kvcache_block_size": 64,
+    "rmsnorm_backend": "sm120",
+    "qk_norm_rope_backend": "torch",
+    "attention_backend": "flashinfer",
+    "enforce_eager_resolved": false
+  },
+  "workload": {
+    "requests": 256,
+    "input_tokens": 142827,
+    "expected_output_tokens": 133966,
+    "actual_output_tokens": 133966
+  },
+  "result": {
+    "init_seconds": 4.1979302589898,
+    "elapsed_seconds": 75.87186718999874,
+    "output_tokens_per_second": 1765.6874011617722,
+    "peak_allocated_gib": 5.088510036468506,
+    "peak_reserved_gib": 5.134765625,
+    "output_sha256": "61639a008755e3779b24e8fe5fe3e5e00967c8c334aefbbe210477350f503c8d"
+  },
+  "engine_metrics": {
+    "requests": 256,
+    "prefill_tokens": 142827,
+    "decode_tokens": 133710,
+    "output_tokens": 133966,
+    "prefill_iterations": 347,
+    "decode_iterations": 6423,
+    "prefill_seconds": 8.156799873977434,
+    "decode_seconds": 67.59079013945302,
+    "total_seconds": 75.87098133895779,
+    "prefill_tokens_per_second": 17510.175829574993,
+    "decode_tokens_per_second": 1774.1118562132522,
+    "output_tokens_per_second": 1765.708016896467,
+    "batch_ttft_seconds": 8.156799873977434,
+    "mean_tpot_seconds": 0.011134183549192237,
+    "mixed_seconds": 7.776498305029236,
+    "mixed_iterations": 346,
+    "scheduler": {
+      "prefill_chunks": 393,
+      "mixed_batches": 346,
+      "prefill_only_batches": 1,
+      "decode_only_batches": 6423,
+      "preemptions": 0
+    },
+    "prefix_cache": {
+      "queries": 585447,
+      "block_hits": 0,
+      "token_hits": 0,
+      "misses": 585447,
+      "hash_collisions": 0,
+      "cached_evictions": 3773
+    }
+  }
+}

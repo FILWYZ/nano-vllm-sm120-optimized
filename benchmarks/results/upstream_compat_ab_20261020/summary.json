@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-20T07:56:17.148804+00:00",
+  "method": "interleaved independent processes",
+  "runs_per_variant": 3,
+  "matched_workload": {
+    "model": "/home/asus/models/Qwen3-0.6B-verified",
+    "suite": "upstream README request distribution",
+    "requests": 256,
+    "prompt_length_range": [
+      100,
+      1024
+    ],
+    "output_length_range": [
+      100,
+      1024
+    ],
+    "seed": 0,
+    "temperature": 0.6,
+    "ignore_eos": true,
+    "max_model_len": 4096,
+    "max_num_seqs": 256,
+    "max_num_batched_tokens": 16384,
+    "gpu_memory_utilization": 0.75
+  },
+  "variants": {
+    "compat": [
+      {
+        "git_commit": "7aa1f251cf1e041ded3371bab41f90e6736111ac",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 256,
+          "rmsnorm_backend": "torch",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "sdpa",
+          "enforce_eager_resolved": true
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 4.912920216971543,
+          "elapsed_seconds": 613.5225538120139,
+          "output_tokens_per_second": 218.3554608834279,
+          "peak_allocated_gib": 4.75862979888916,
+          "peak_reserved_gib": 4.94140625,
+          "output_sha256": "945d1c37cf72bcf6384276871c3ae2322585860a040a3f29845fff7eeee8cdde"
+        }
+      },
+      {
+        "git_commit": "7aa1f251cf1e041ded3371bab41f90e6736111ac",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 256,
+          "rmsnorm_backend": "torch",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "sdpa",
+          "enforce_eager_resolved": true
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 2.8474974120035768,
+          "elapsed_seconds": 621.2370281490148,
+          "output_tokens_per_second": 215.6439393175802,
+          "peak_allocated_gib": 4.758904457092285,
+          "peak_reserved_gib": 4.978515625,
+          "output_sha256": "945d1c37cf72bcf6384276871c3ae2322585860a040a3f29845fff7eeee8cdde"
+        }
+      },
+      {
+        "git_commit": "7aa1f251cf1e041ded3371bab41f90e6736111ac",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 256,
+          "rmsnorm_backend": "torch",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "sdpa",
+          "enforce_eager_resolved": true
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 2.8726412910036743,
+          "elapsed_seconds": 618.6737594550359,
+          "output_tokens_per_second": 216.53738816723873,
+          "peak_allocated_gib": 4.758904457092285,
+          "peak_reserved_gib": 4.978515625,
+          "output_sha256": "945d1c37cf72bcf6384276871c3ae2322585860a040a3f29845fff7eeee8cdde"
+        }
+      }
+    ],
+    "optimized": [
+      {
+        "git_commit": "11d0aa58a2c68d7132dd0d919e1029afea6a6aa2",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 64,
+          "rmsnorm_backend": "sm120",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "flashinfer",
+          "enforce_eager_resolved": false
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 5.5134691260172985,
+          "elapsed_seconds": 76.55758050299482,
+          "output_tokens_per_second": 1749.872437449345,
+          "peak_allocated_gib": 5.08959436416626,
+          "peak_reserved_gib": 5.13671875,
+          "output_sha256": "61639a008755e3779b24e8fe5fe3e5e00967c8c334aefbbe210477350f503c8d"
+        }
+      },
+      {
+        "git_commit": "11d0aa58a2c68d7132dd0d919e1029afea6a6aa2",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 64,
+          "rmsnorm_backend": "sm120",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "flashinfer",
+          "enforce_eager_resolved": false
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 4.1979302589898,
+          "elapsed_seconds": 75.87186718999874,
+          "output_tokens_per_second": 1765.6874011617722,
+          "peak_allocated_gib": 5.088510036468506,
+          "peak_reserved_gib": 5.134765625,
+          "output_sha256": "61639a008755e3779b24e8fe5fe3e5e00967c8c334aefbbe210477350f503c8d"
+        }
+      },
+      {
+        "git_commit": "11d0aa58a2c68d7132dd0d919e1029afea6a6aa2",
+        "resolved_config": {
+          "model": "/home/asus/models/Qwen3-0.6B-verified",
+          "model_dtype": "torch.bfloat16",
+          "seed": 0,
+          "temperature": 0.6,
+          "max_model_len": 4096,
+          "max_num_seqs": 256,
+          "max_num_batched_tokens": 16384,
+          "gpu_memory_utilization": 0.75,
+          "kvcache_block_size": 64,
+          "rmsnorm_backend": "sm120",
+          "qk_norm_rope_backend": "torch",
+          "attention_backend": "flashinfer",
+          "enforce_eager_resolved": false
+        },
+        "workload": {
+          "requests": 256,
+          "input_tokens": 142827,
+          "expected_output_tokens": 133966,
+          "actual_output_tokens": 133966
+        },
+        "result": {
+          "init_seconds": 4.227834402990993,
+          "elapsed_seconds": 75.75878937699599,
+          "output_tokens_per_second": 1768.3228718630833,
+          "peak_allocated_gib": 5.088510036468506,
+          "peak_reserved_gib": 5.134765625,
+          "output_sha256": "61639a008755e3779b24e8fe5fe3e5e00967c8c334aefbbe210477350f503c8d"
+        }
+      }
+    ]
+  }
+}

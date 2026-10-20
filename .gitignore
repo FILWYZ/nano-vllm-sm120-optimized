@@ -211,3 +211,9 @@ benchmarks/results/*
 # Reproducible local edge acceptance artifacts
 !benchmarks/results/edge_acceptance_20261007/
 !benchmarks/results/edge_acceptance_20261007/**
+
+# Current same-device compatibility A/B and sustained edge soak evidence.
+!benchmarks/results/upstream_compat_ab_20261020/
+!benchmarks/results/upstream_compat_ab_20261020/**
+!benchmarks/results/edge_soak_20261020/
+!benchmarks/results/edge_soak_20261020/**

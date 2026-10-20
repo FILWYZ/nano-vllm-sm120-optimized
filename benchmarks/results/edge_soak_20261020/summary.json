@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "timestamp_utc": "2026-10-20T08:28:52.105709+00:00",
+  "git_commit": "11d0aa58a2c68d7132dd0d919e1029afea6a6aa2",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "model": "/home/asus/models/Qwen3-0.6B-verified",
+  "dtype": "bfloat16",
+  "device": "NVIDIA GeForce RTX 5060",
+  "compute_capability": [
+    12,
+    0
+  ],
+  "software": {
+    "torch": "2.14.1+cu130",
+    "cuda_runtime": "13.0",
+    "python": "3.12.3"
+  },
+  "engine": {
+    "attention": "flashinfer",
+    "rmsnorm": "sm120",
+    "qk_norm_rope": "torch",
+    "kv_page_tokens": 16,
+    "cuda_graph": true
+  },
+  "workload": {
+    "requests": 8,
+    "cases": [
+      {
+        "prompt_tokens": 64,
+        "output_tokens": 32
+      },
+      {
+        "prompt_tokens": 256,
+        "output_tokens": 32
+      }
+    ],
+    "temperature": 0.6,
+    "ignore_eos": true,
+    "warmups_per_case": 3,
+    "duration_target_s": 1800.0,
+    "duration_measured_s": 1800.1619994009961,
+    "calls": 8969,
+    "successful_calls": 8969,
+    "failed_calls": 0,
+    "preemptions": 0,
+    "completion_tokens": 2296064
+  },
+  "performance": {
+    "whole_window_tokens_per_second": 1275.476318666884,
+    "call_tps": {
+      "min": 1005.4512779026345,
+      "median": 1261.862032867238,
+      "mean": 1304.797645898223,
+      "max": 1530.4702214599354
+    },
+    "per_minute": [
+      {
+        "minute": 0,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 1,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 2,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 3,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 4,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 5,
+        "seconds": 60.0,
+        "output_tokens": 76800,
+        "tokens_per_second": 1280.0
+      },
+      {
+        "minute": 6,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 7,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 8,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 9,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 10,
+        "seconds": 60.0,
+        "output_tokens": 76800,
+        "tokens_per_second": 1280.0
+      },
+      {
+        "minute": 11,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 12,
+        "seconds": 60.0,
+        "output_tokens": 76800,
+        "tokens_per_second": 1280.0
+      },
+      {
+        "minute": 13,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 14,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 15,
+        "seconds": 60.0,
+        "output_tokens": 76800,
+        "tokens_per_second": 1280.0
+      },
+      {
+        "minute": 16,
+        "seconds": 60.0,
+        "output_tokens": 76800,
+        "tokens_per_second": 1280.0
+      },
+      {
+        "minute": 17,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 18,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 19,
+        "seconds": 60.0,
+        "output_tokens": 77056,
+        "tokens_per_second": 1284.2666666666667
+      },
+      {
+        "minute": 20,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 21,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 22,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 23,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 24,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 25,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 26,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 27,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 28,
+        "seconds": 60.0,
+        "output_tokens": 76288,
+        "tokens_per_second": 1271.4666666666667
+      },
+      {
+        "minute": 29,
+        "seconds": 60.0,
+        "output_tokens": 76544,
+        "tokens_per_second": 1275.7333333333333
+      },
+      {
+        "minute": 30,
+        "seconds": 0.1619994009961374,
+        "output_tokens": 256,
+        "tokens_per_second": 1580.252756651266
+      }
+    ],
+    "peak_allocated_gib": 4.798730850219727,
+    "peak_reserved_gib": 4.875
+  },
+  "energy": {
+    "method": "trapezoidal integral of nvidia-smi GPU board power at 1 s; idle estimate from pre-run samples",
+    "sample_interval_s": 1,
+    "samples_in_window": 1798,
+    "covered_s": 1799.5280291640083,
+    "idle_power_median_w": 24.745,
+    "gross_board_energy_j": 184027.31901902027,
+    "idle_adjusted_board_energy_j_estimate": 139497.99793735688,
+    "gross_tokens_per_joule": 12.476756235103815,
+    "idle_adjusted_tokens_per_joule_estimate": 16.459476364894304
+  },
+  "gpu_telemetry": {
+    "power_w": {
+      "min": 34.56,
+      "median": 102.64,
+      "mean": 102.2538765294772,
+      "max": 104.54
+    },
+    "temperature_c": {
+      "min": 42.0,
+      "median": 60.0,
+      "mean": 60.011123470522804,
+      "max": 66.0
+    },
+    "graphics_clock_mhz": {
+      "min": 2512.0,
+      "median": 2722.0,
+      "mean": 2725.202447163515,
+      "max": 2737.0
+    },
+    "memory_clock_mhz": {
+      "min": 13801.0,
+      "median": 13801.0,
+      "mean": 13801.0,
+      "max": 13801.0
+    },
+    "gpu_utilization_percent": {
+      "min": 66.0,
+      "median": 85.0,
+      "mean": 84.78142380422692,
+      "max": 88.0
+    }
+  },
+  "limitations": [
+    "GPU board energy excludes laptop CPU, display, memory, and AC/DC conversion losses.",
+    "Idle-adjusted energy subtracts a pre-run idle median and is an estimate.",
+    "This is a fixed synthetic-token prompt soak, not a diverse live-user traffic trace."
+  ]
+}
